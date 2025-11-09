@@ -1,0 +1,30 @@
+{
+  "name": "wkhtmltopdf-playwright-wrapper",
+  "version": "1.0.0",
+  "description": "wkhtmltopdf wrapper using Playwright for modern CSS support on macOS",
+  "main": "wkhtmltopdf.js",
+  "bin": {
+    "wkhtmltopdf": "./wkhtmltopdf.js"
+  },
+  "scripts": {
+    "test": "node wkhtmltopdf.js ../examples/modern_css_demo.html test.pdf"
+  },
+  "keywords": [
+    "wkhtmltopdf",
+    "pdf",
+    "html",
+    "chromium",
+    "playwright",
+    "css3",
+    "flexbox",
+    "grid"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

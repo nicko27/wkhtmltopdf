@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern CSS Features Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        /* ========== FLEXBOX DEMO ========== */
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #444;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .flex-item {
+            flex: 1;
+            min-width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .flex-item h3 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .flex-item p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* ========== GRID DEMO ========== */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .grid-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .grid-item-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        /* ========== ADVANCED GRID ========== */
+        .advanced-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .grid-feature {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .grid-feature.large {
+            grid-row: 1 / 3;
+        }
+
+        /* ========== MODERN CSS FEATURES ========== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2em;
+            color: white;
+        }
+
+        /* ========== CSS TRANSFORMS ========== */
+        .transform-demo {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .transform-box {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+        }
+
+        .rotate { transform: rotate(15deg); }
+        .scale { transform: scale(1.1); }
+        .skew { transform: skewY(-5deg); }
+
+        /* ========== COMPLEX LAYOUT ========== */
+        .complex-layout {
+            display: grid;
+            grid-template-areas:
+                "header header header"
+                "sidebar content content"
+                "footer footer footer";
+            grid-template-columns: 200px 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .header-area { grid-area: header; background: #667eea; }
+        .sidebar-area { grid-area: sidebar; background: #764ba2; }
+        .content-area { grid-area: content; background: #f093fb; }
+        .footer-area { grid-area: footer; background: #667eea; }
+
+        .complex-layout > div {
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box strong {
+            color: #2196F3;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Modern CSS Features Demo <span class="badge">CSS3</span></h1>
+        <p class="subtitle">Showcasing Flexbox, Grid, Transforms, and Modern Layout Capabilities</p>
+
+        <div class="info-box">
+            <strong>⚠️ Important:</strong> This document requires <code>WebEngine</code> backend to render correctly.
+            Use: <code>wkhtmltopdf --render-backend webengine modern_css_demo.html output.pdf</code>
+        </div>
+
+        <!-- FLEXBOX SECTION -->
+        <div class="section">
+            <h2 class="section-title">🎯 CSS Flexbox</h2>
+            <p style="margin-bottom: 20px;">
+                Flexible box layout enables responsive design with proper alignment and distribution.
+            </p>
+
+            <div class="flex-container">
+                <div class="flex-item">
+                    <h3>Flexible</h3>
+                    <p>Items automatically adjust their size and position based on available space.</p>
+                </div>
+                <div class="flex-item">
+                    <h3>Responsive</h3>
+                    <p>Perfect for creating layouts that adapt to different screen sizes.</p>
+                </div>
+                <div class="flex-item">
+                    <h3>Powerful</h3>
+                    <p>Complex alignment and distribution made simple with flexbox.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRID SECTION -->
+        <div class="section">
+            <h2 class="section-title">📐 CSS Grid Layout</h2>
+            <p style="margin-bottom: 20px;">
+                Two-dimensional grid system for complex layouts with rows and columns.
+            </p>
+
+            <div class="grid-container">
+                <div class="grid-item">
+                    <div class="grid-item-number">1</div>
+                    <strong>Auto Sizing</strong>
+                    <p>Grid items size automatically</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-number">2</div>
+                    <strong>Gap Control</strong>
+                    <p>Easy spacing between items</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-number">3</div>
+                    <strong>Responsive</strong>
+                    <p>Auto-fit and auto-fill</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-number">4</div>
+                    <strong>Alignment</strong>
+                    <p>Perfect item positioning</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-number">5</div>
+                    <strong>Spanning</strong>
+                    <p>Items can span rows/cols</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-number">6</div>
+                    <strong>Areas</strong>
+                    <p>Named grid template areas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADVANCED GRID -->
+        <div class="section">
+            <h2 class="section-title">🎨 Advanced Grid Features</h2>
+            <div class="advanced-grid">
+                <div class="grid-feature large">
+                    <h3>Large Feature (Spanning Rows)</h3>
+                    <p>This grid item spans 2 rows using <code>grid-row: 1 / 3</code></p>
+                    <p>Grid makes complex layouts simple and maintainable.</p>
+                </div>
+                <div class="grid-feature">
+                    <h3>Feature A</h3>
+                    <p>Standard grid item in top-right position</p>
+                </div>
+                <div class="grid-feature">
+                    <h3>Feature B</h3>
+                    <p>Standard grid item in bottom-right position</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS TRANSFORMS -->
+        <div class="section">
+            <h2 class="section-title">🔄 CSS Transforms</h2>
+            <p style="margin-bottom: 20px; text-align: center;">
+                Modern browsers support 2D and 3D transformations
+            </p>
+            <div class="transform-demo">
+                <div class="transform-box rotate">Rotate</div>
+                <div class="transform-box scale">Scale</div>
+                <div class="transform-box skew">Skew</div>
+            </div>
+        </div>
+
+        <!-- COMPLEX LAYOUT -->
+        <div class="section">
+            <h2 class="section-title">🏗️ Complex Grid Layout</h2>
+            <p style="margin-bottom: 20px;">
+                Using named grid template areas for intuitive layout definition
+            </p>
+            <div class="complex-layout">
+                <div class="header-area">HEADER</div>
+                <div class="sidebar-area">SIDEBAR</div>
+                <div class="content-area">CONTENT</div>
+                <div class="footer-area">FOOTER</div>
+            </div>
+        </div>
+
+        <!-- FEATURE ICONS -->
+        <div class="section">
+            <h2 class="section-title">✨ Modern CSS Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h4>Responsive</h4>
+                    <p>Auto-adapting layouts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h4>Gradients</h4>
+                    <p>Beautiful colors</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔲</div>
+                    <h4>Shadows</h4>
+                    <p>Depth and dimension</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h4>Transforms</h4>
+                    <p>Rotate, scale, skew</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📐</div>
+                    <h4>Grid</h4>
+                    <p>2D layouts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h4>Flexbox</h4>
+                    <p>1D layouts</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 40px;">
+            <strong>🚀 Testing:</strong> Compare the output between backends:<br>
+            • <code>wkhtmltopdf --render-backend webkit modern_css_demo.html webkit-output.pdf</code> (will look broken)<br>
+            • <code>wkhtmltopdf --render-backend webengine modern_css_demo.html webengine-output.pdf</code> (perfect rendering)
+        </div>
+    </div>
+</body>
+</html>

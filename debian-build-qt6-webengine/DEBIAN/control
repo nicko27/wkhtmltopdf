@@ -1,0 +1,14 @@
+Package: wkhtmltopdf-qt6
+Version: 1.0.0-ubuntu24.04
+Section: utils
+Priority: optional
+Architecture: arm64
+Maintainer: wkhtmltopdf Team <support@wkhtmltopdf.org>
+Homepage: https://wkhtmltopdf.org
+Depends: libqt6core6, libqt6gui6, libqt6network6, libqt6svg6, libqt6webenginecore6, libqt6webenginewidgets6, libqt6printsupport6, libssl3, libfontconfig1, libfreetype6, libx11-6, libxrender1, libxext6, libc6, libnss3, libxcomposite1, libxcursor1, libxdamage1, libxi6, libxtst6
+Recommends: qt6-webengine-dev
+Conflicts: wkhtmltopdf-webengine, wkhtmltopdf-webkit, wkhtmltopdf
+Provides: wkhtmltopdf
+Description: HTML to PDF converter with Qt6 WebEngine (v1.0.0)
+ wkhtmltopdf Qt6 with Chromium 108+ rendering engine.
+Installed-Size: 1192

@@ -21,6 +21,7 @@
 #include "outputter.hh"
 #include "pdfcommandlineparser.hh"
 #include <QWebFrame>
+#include <renderengine.hh>
 
 #define STRINGIZE_(x) #x
 #define STRINGIZE(x) STRINGIZE_(x)
@@ -102,6 +103,16 @@ void PdfCommandLineParser::outputDescripton(Outputter * o) const {
 	o->text(" using wkhtmltopdf patched qt.");
 #endif
 	o->endParagraph();
+
+	// Display rendering backend information
+	o->beginParagraph();
+	wkhtmltopdf::RenderBackend backend = wkhtmltopdf::RenderEngineFactory::defaultBackend();
+	o->text("Rendering backend: ");
+	o->bold(wkhtmltopdf::RenderEngineFactory::backendName(backend));
+	o->text(" - ");
+	o->text(wkhtmltopdf::RenderEngineFactory::backendCapabilities(backend));
+	o->endParagraph();
+
 	o->endSection();
 }
 

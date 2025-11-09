@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ -x /sbin/ldconfig ]; then
+    /sbin/ldconfig
+fi
+if [ -x /usr/local/bin/wkhtmltopdf ]; then
+    echo "wkhtmltopdf installed successfully!"
+    /usr/local/bin/wkhtmltopdf --version || true
+fi
+exit 0

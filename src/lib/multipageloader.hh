@@ -24,11 +24,16 @@
 #include <QFile>
 #include <QObject>
 #include <QUrl>
+
+// Only include WebKit if it's being used
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #if QT_VERSION >= 0x050000
 #include <QtWebKitWidgets>
 #else
 #include <QWebPage>
 #endif
+#endif
+
 #include <loadsettings.hh>
 
 #include <dllbegin.inc>

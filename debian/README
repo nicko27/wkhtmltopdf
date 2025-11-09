@@ -1,0 +1,83 @@
+wkhtmltopdf 0.13.0 - Debian Package Files
+=========================================
+
+This directory contains the Debian packaging metadata for wkhtmltopdf 0.13.0.
+
+STRUCTURE
+---------
+debian/
+├── DEBIAN/
+│   ├── control       - Package metadata (version, dependencies, description)
+│   ├── postinst      - Post-installation script (runs ldconfig)
+│   └── postrm        - Post-removal script (cleans up)
+└── usr/
+    └── share/
+        └── doc/
+            └── wkhtmltopdf/
+                ├── copyright         - License information (LGPL-3)
+                └── changelog.Debian.gz - Changelog in Debian format
+
+BUILDING THE PACKAGE
+--------------------
+From the root directory, run:
+
+    ./build-deb.sh
+
+This will:
+1. Create the package structure
+2. Copy binaries and libraries
+3. Generate metadata
+4. Build wkhtmltopdf_0.13.0_<arch>.deb
+
+INSTALLING THE PACKAGE
+----------------------
+    sudo dpkg -i wkhtmltopdf_0.13.0_amd64.deb
+    sudo apt-get install -f  # Install missing dependencies
+
+PACKAGE CONTENTS
+----------------
+The package installs:
+- /usr/local/bin/wkhtmltopdf      - Main binary
+- /usr/local/bin/wkhtmltoimage    - Image converter binary
+- /usr/local/lib/libwkhtmltox.so* - Shared library (with symlinks)
+- /usr/local/include/wkhtmltox/   - C headers for library
+- /etc/ld.so.conf.d/wkhtmltopdf.conf - ldconfig configuration
+
+DEPENDENCIES
+------------
+See debian/DEBIAN/control for the full list.
+
+Key dependencies:
+- Qt5 libraries (Core, GUI, Network, SVG, XML Patterns)
+- Qt WebEngine (recommended) or Qt WebKit (fallback)
+- SSL, FontConfig, FreeType, X11 libraries
+
+BACKEND SELECTION
+-----------------
+Version 0.13.0 features automatic backend detection:
+- Qt WebEngine (Chromium) is used if available → Modern CSS3 support
+- Qt WebKit is used as fallback → Legacy CSS support
+
+No configuration needed! The best available backend is selected automatically.
+
+VERSION HISTORY
+---------------
+0.13.0 (2024-11-09)
+  - Automatic backend detection and selection
+  - Full CSS3 support (Flexbox, Grid, Animations)
+  - Multi-backend architecture
+  - Improved installation and packaging
+  - Comprehensive documentation
+
+0.12.7-dev
+  - Development version (previous)
+
+MORE INFORMATION
+----------------
+Documentation:
+  /usr/share/doc/wkhtmltopdf/README
+  /usr/share/doc/wkhtmltopdf/MULTI_BACKEND.md
+  /usr/share/doc/wkhtmltopdf/AUTO_BACKEND_DETECTION.md
+
+Homepage: https://wkhtmltopdf.org
+License: LGPL-3.0 (see /usr/share/doc/wkhtmltopdf/copyright)

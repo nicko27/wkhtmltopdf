@@ -1,0 +1,87 @@
+wkhtmltopdf - Multi-Backend Edition
+====================================
+
+This is a fork of the wkhtmltopdf project with substantial enhancements
+for modern CSS support and multi-backend rendering capabilities.
+
+ORIGINAL PROJECT
+----------------
+Copyright (C) 2010-2020 wkhtmltopdf authors
+Project URL: https://github.com/wkhtmltopdf/wkhtmltopdf
+Original License: GNU Lesser General Public License v3 (LGPLv3)
+
+MULTI-BACKEND ENHANCEMENTS
+--------------------------
+Copyright (C) 2024-2025 wkhtmltopdf Multi-Backend Contributors
+Enhancements License: GNU Lesser General Public License v3 (LGPLv3)
+
+Major Enhancements:
+- Multi-backend architecture (Qt WebKit + Qt WebEngine)
+- Full CSS3 support via Qt WebEngine (Flexbox, Grid, Transforms, etc.)
+- Runtime backend selection
+- HTML/CSS validator with compatibility checking
+- Structured error handling system
+- Comprehensive build and installation scripts
+- Multiple Debian package variants (Qt5/Qt6, WebKit/WebEngine)
+- Playwright wrapper for macOS compatibility
+- Enhanced documentation and examples
+
+THIRD-PARTY COMPONENTS
+----------------------
+
+This software uses the following third-party components:
+
+1. Qt Framework (QtCore, QtGui, QtNetwork, QtWebKit, QtWebEngine)
+   Copyright (C) The Qt Company Ltd.
+   License: LGPL v3 / GPL v3 / Commercial
+   URL: https://www.qt.io/
+
+2. Qt WebEngine (includes Chromium)
+   Copyright (C) The Chromium Authors
+   License: BSD and other permissive licenses
+   URL: https://wiki.qt.io/QtWebEngine/Licensing
+
+3. Playwright (optional wrapper)
+   Copyright (C) Microsoft Corporation
+   License: Apache License 2.0
+   URL: https://playwright.dev/
+
+LICENSE
+-------
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+ATTRIBUTION REQUIREMENTS
+------------------------
+If you distribute or modify this software, you must:
+
+1. Retain all copyright notices from both the original project and
+   the multi-backend enhancements
+2. Clearly indicate that this is a modified version
+3. Provide access to the complete source code (LGPLv3 requirement)
+4. Include this NOTICE file or equivalent attribution
+5. Maintain the same LGPLv3 license terms
+
+TRADEMARKS
+----------
+"wkhtmltopdf" is a name associated with the original project. This fork
+is an independent derivative work and is not officially endorsed by the
+original wkhtmltopdf project maintainers.
+
+CONTACT
+-------
+For issues specific to the multi-backend enhancements, please open an
+issue on this fork's repository.
+
+For issues with the original wkhtmltopdf functionality, please refer to:
+https://github.com/wkhtmltopdf/wkhtmltopdf/issues

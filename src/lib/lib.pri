@@ -26,6 +26,26 @@ SOURCES += ../lib/loadsettings.cc ../lib/logging.cc ../lib/multipageloader.cc \
 	   ../lib/tempfile.cc ../lib/converter.cc ../lib/websettings.cc  \
   	   ../lib/reflect.cc ../lib/utilities.cc
 
+# Rendering engine abstraction layer
+PUBLIC_HEADERS += ../lib/renderengine.hh
+SOURCES += ../lib/renderengine.cc
+
+# Validation and Error Handling
+PUBLIC_HEADERS += ../lib/validator.hh ../lib/errors.hh
+SOURCES += ../lib/validator.cc ../lib/errors.cc
+
+# WebKit backend
+contains(DEFINES, WKHTMLTOPDF_USE_WEBKIT) {
+    PUBLIC_HEADERS += ../lib/renderengine_webkit.hh
+    SOURCES += ../lib/renderengine_webkit.cc
+}
+
+# WebEngine backend
+contains(DEFINES, WKHTMLTOPDF_USE_WEBENGINE) {
+    PUBLIC_HEADERS += ../lib/renderengine_webengine.hh
+    SOURCES += ../lib/renderengine_webengine.cc
+}
+
 #Pdf
 PUBLIC_HEADERS += ../lib/pdfconverter.hh ../lib/pdfsettings.hh
 HEADERS += ../lib/pdfconverter_p.hh
