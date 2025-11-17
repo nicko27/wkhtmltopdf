@@ -21,7 +21,9 @@
 #include "imagecommandlineparser.hh"
 #include "progressfeedback.hh"
 #include <QApplication>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebFrame>
+#endif
 #include <imageconverter.hh>
 #include <imagesettings.hh>
 #include <utilities.hh>

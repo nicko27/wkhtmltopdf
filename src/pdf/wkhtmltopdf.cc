@@ -23,7 +23,9 @@
 #include <QCommonStyle>
 #include <QPainter>
 #include <QStyleOption>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebFrame>
+#endif
 #include <QtPlugin>
 #include <cstdlib>
 #include <iostream>
