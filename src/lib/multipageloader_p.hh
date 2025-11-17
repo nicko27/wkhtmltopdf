@@ -68,6 +68,7 @@ signals:
 class DLL_LOCAL MultiPageLoaderPrivate;
 class DLL_LOCAL ResourceObject;
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 class DLL_LOCAL MyQWebPage: public QWebPage {
 	Q_OBJECT ;
 private:
@@ -82,6 +83,7 @@ public:
 public slots:
 	bool shouldInterruptJavaScript();
 };
+#endif
 
 class DLL_LOCAL ResourceObject: public QObject {
 	Q_OBJECT
@@ -96,8 +98,10 @@ private:
 	MultiPageLoaderPrivate & multiPageLoader;
 public:
 	ResourceObject(MultiPageLoaderPrivate & mpl, const QUrl & u, const settings::LoadPage & s);
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	MyQWebPage webPage;
 	LoaderObject lo;
+#endif
 	int httpErrorCode;
 	const settings::LoadPage settings;
 public slots:
@@ -106,7 +110,9 @@ public slots:
 	void loadProgress(int progress);
 	void loadFinished(bool ok);
 	void waitWindowStatus();
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	void printRequested(QWebFrame * frame);
+#endif
 	void loadDone();
 	void handleAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
 	void debug(const QString & str);

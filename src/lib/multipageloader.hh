@@ -39,6 +39,7 @@
 #include <dllbegin.inc>
 namespace wkhtmltopdf {
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 class DLL_LOCAL MyQWebPage;
 
 class DLL_LOCAL LoaderObject {
@@ -48,6 +49,7 @@ public:
 
 	LoaderObject(QWebPage & page);
 };
+#endif
 
 class DLL_LOCAL MultiPageLoaderPrivate;
 class DLL_LOCAL MultiPageLoader: public QObject {
@@ -55,8 +57,10 @@ class DLL_LOCAL MultiPageLoader: public QObject {
 public:
 	MultiPageLoader(settings::LoadGlobal & s, int dpi, bool mainLoader = false);
 	~MultiPageLoader();
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	LoaderObject * addResource(const QString & url, const settings::LoadPage & settings, const QString * data=NULL);
 	LoaderObject * addResource(const QUrl & url, const settings::LoadPage & settings);
+#endif
 	static QUrl guessUrlFromString(const QString &string);
 	int httpErrorCode();
 	static bool copyFile(QFile & src, QFile & dst);
