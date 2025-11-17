@@ -20,9 +20,6 @@
 
 #include "imagecommandlineparser.hh"
 #include "outputter.hh"
-#ifdef WKHTMLTOPDF_USE_WEBKIT
-#include <qwebframe.h>
-#endif
 
 /*!
   \file commandlineparser.hh

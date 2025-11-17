@@ -34,12 +34,6 @@ SOURCES += ../lib/renderengine.cc
 PUBLIC_HEADERS += ../lib/validator.hh ../lib/errors.hh
 SOURCES += ../lib/validator.cc ../lib/errors.cc
 
-# WebKit backend
-contains(DEFINES, WKHTMLTOPDF_USE_WEBKIT) {
-    PUBLIC_HEADERS += ../lib/renderengine_webkit.hh
-    SOURCES += ../lib/renderengine_webkit.cc
-}
-
 # WebEngine backend
 contains(DEFINES, WKHTMLTOPDF_USE_WEBENGINE) {
     PUBLIC_HEADERS += ../lib/renderengine_webengine.hh
