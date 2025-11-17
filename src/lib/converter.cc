@@ -21,7 +21,9 @@
 
 #include "converter_p.hh"
 #include "multipageloader.hh"
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebFrame>
+#endif
 #include <qapplication.h>
 
 #ifdef QT4_STATICPLUGIN_TEXTCODECS
@@ -34,7 +36,7 @@ Q_IMPORT_PLUGIN(qtwcodecs)
 
 namespace wkhtmltopdf {
 
-
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 void ConverterPrivate::updateWebSettings(QWebSettings * ws, const settings::Web & s) const {
 	if (!s.defaultEncoding.isEmpty())
 		ws->setDefaultTextEncoding(s.defaultEncoding);
@@ -56,6 +58,7 @@ void ConverterPrivate::updateWebSettings(QWebSettings * ws, const settings::Web 
 	if (!s.userStyleSheet.isEmpty())
 		ws->setUserStyleSheetUrl(MultiPageLoader::guessUrlFromString(s.userStyleSheet));
 }
+#endif
 
 void ConverterPrivate::fail() {
 	error = true;

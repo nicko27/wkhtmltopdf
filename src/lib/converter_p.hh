@@ -24,7 +24,9 @@
 #include "converter.hh"
 #include "websettings.hh"
 #include <QFile>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebSettings>
+#endif
 
 #include "dllbegin.inc"
 
@@ -47,7 +49,9 @@ protected:
 
 	bool conversionDone;
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	void updateWebSettings(QWebSettings * ws, const settings::Web & s) const;
+#endif
 public slots:
 	void fail();
 	void loadProgress(int progress);
