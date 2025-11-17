@@ -20,9 +20,6 @@
 
 #include "imagecommandlineparser.hh"
 #include "outputter.hh"
-#ifdef WKHTMLTOPDF_USE_WEBKIT
-#include <QWebFrame>
-#endif
 
 #define STRINGIZE_(x) #x
 #define STRINGIZE(x) STRINGIZE_(x)

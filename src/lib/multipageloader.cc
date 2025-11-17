@@ -642,16 +642,13 @@ MultiPageLoaderPrivate::~MultiPageLoaderPrivate() {
 	clearResources();
 }
 
-LoaderObject * MultiPageLoaderPrivate::addResource(const QUrl & url, const settings::LoadPage & page) {
-	ResourceObject * ro = new ResourceObject(*this, url, page);
-	resources.push_back(ro);
-
 #ifdef WKHTMLTOPDF_USE_WEBKIT
-	return &ro->lo;
-#else
-	return NULL;
-#endif
+LoaderObject * MultiPageLoaderPrivate::addResource(const QUrl & url, const settings::LoadPage & page) {
+        ResourceObject * ro = new ResourceObject(*this, url, page);
+        resources.push_back(ro);
+        return &ro->lo;
 }
+#endif
 
 void MultiPageLoaderPrivate::load() {
 	progressSum=0;

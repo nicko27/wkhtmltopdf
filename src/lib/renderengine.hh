@@ -51,11 +51,10 @@ class RenderFrame;
 class RenderElement;
 
 /*!
- * \brief Enumeration of available rendering backends
+ * \brief Rendering backend options (WebEngine only)
  */
 enum class RenderBackend {
-	WebKit,    // Qt WebKit (legacy, CSS from ~2012)
-	WebEngine  // Qt WebEngine (modern, full Chromium CSS support)
+        WebEngine  // Qt WebEngine (modern, full Chromium CSS support)
 };
 
 /*!
@@ -88,8 +87,8 @@ using JavaScriptCallback = std::function<void(const QString & result)>;
 /*!
  * \brief Abstract interface for a rendered frame
  *
- * Represents a frame within a page. In WebKit this maps to QWebFrame,
- * in WebEngine frame access is more limited and done via JavaScript.
+ * Represents a frame within a page. WebEngine frame access is more limited
+ * and done via JavaScript.
  */
 class DLL_PUBLIC RenderFrame : public QObject {
 	Q_OBJECT
@@ -118,8 +117,8 @@ signals:
 /*!
  * \brief Abstract interface for a web page
  *
- * This is the main abstraction over QWebPage (WebKit) and QWebEnginePage (WebEngine).
- * All operations that need to work across both backends go through this interface.
+ * This is the main abstraction over QWebEnginePage.
+ * All operations that need to work with the backend go through this interface.
  */
 class DLL_PUBLIC RenderPage : public QObject {
 	Q_OBJECT
@@ -183,7 +182,7 @@ public:
 	// Set the default backend (useful for testing or runtime switching)
 	static void setDefaultBackend(RenderBackend backend);
 
-	// Get the best available backend (WebEngine preferred, then WebKit)
+        // Get the best available backend (WebEngine only)
 	static RenderBackend getBestAvailableBackend();
 
 	// Check if a backend is available (compiled in)
