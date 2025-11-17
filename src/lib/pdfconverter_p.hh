@@ -34,10 +34,14 @@
 #include <QPrinter>
 #include <QRegExp>
 #include <QWaitCondition>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebPage>
+#endif
 #include <qnetworkreply.h>
 #ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebElement>
+#endif
 #endif
 
 #include "dllbegin.inc"

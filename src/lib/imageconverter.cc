@@ -31,9 +31,11 @@
 #include <QPainter>
 #include <QSvgGenerator>
 #include <QUrl>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebElement>
 #include <QWebFrame>
 #include <QWebPage>
+#endif
 #include <qapplication.h>
 
 #ifdef Q_OS_WIN32
