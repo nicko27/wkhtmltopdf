@@ -16,13 +16,13 @@ Copyright (C) 2024-2025 wkhtmltopdf Multi-Backend Contributors
 Enhancements License: GNU Lesser General Public License v3 (LGPLv3)
 
 Major Enhancements:
-- Multi-backend architecture (Qt WebKit + Qt WebEngine)
+- WebEngine rendering stack (Chromium, Qt WebEngine)
 - Full CSS3 support via Qt WebEngine (Flexbox, Grid, Transforms, etc.)
 - Runtime backend selection
 - HTML/CSS validator with compatibility checking
 - Structured error handling system
 - Comprehensive build and installation scripts
-- Multiple Debian package variants (Qt5/Qt6, WebKit/WebEngine)
+- Debian package variants for Qt5/Qt6 (WebEngine-only)
 - Playwright wrapper for macOS compatibility
 - Enhanced documentation and examples
 
@@ -31,7 +31,7 @@ THIRD-PARTY COMPONENTS
 
 This software uses the following third-party components:
 
-1. Qt Framework (QtCore, QtGui, QtNetwork, QtWebKit, QtWebEngine)
+1. Qt Framework (QtCore, QtGui, QtNetwork, QtWebEngine)
    Copyright (C) The Qt Company Ltd.
    License: LGPL v3 / GPL v3 / Commercial
    URL: https://www.qt.io/

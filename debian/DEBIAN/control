@@ -13,11 +13,10 @@ Description: HTML to PDF converter (with modern CSS support)
  and various image formats using Qt rendering engines.
  .
  Version 0.13.0 features:
-  * Automatic backend detection (WebEngine preferred, WebKit fallback)
-  * Full CSS3 support with WebEngine backend (Flexbox, Grid, Animations)
+  * WebEngine backend (Chromium) with full CSS3 support (Flexbox, Grid, Animations)
   * Chromium-based rendering engine for modern web pages
-  * Legacy WebKit support for compatibility
-  * Multi-backend architecture with runtime selection
+  * Legacy WebKit backend removed
+  * Single-backend architecture focused on WebEngine
  .
  This package includes both wkhtmltopdf (HTML to PDF) and wkhtmltoimage
  (HTML to image) converters with the libwkhtmltox shared library.
