@@ -42,7 +42,9 @@ private:
 	ImageConverter & out;
 	void clearResources();
 
-	LoaderObject * loaderObject;
+        #ifdef WKHTMLTOPDF_USE_WEBKIT
+        LoaderObject * loaderObject;
+        #endif
 
 public slots:
 	void pagesLoaded(bool ok);

@@ -49,14 +49,14 @@ See debian/DEBIAN/control for the full list.
 
 Key dependencies:
 - Qt5 libraries (Core, GUI, Network, SVG, XML Patterns)
-- Qt WebEngine (recommended) or Qt WebKit (fallback)
+- Qt WebEngine (Chromium)
 - SSL, FontConfig, FreeType, X11 libraries
 
 BACKEND SELECTION
 -----------------
 Version 0.13.0 features automatic backend detection:
 - Qt WebEngine (Chromium) is used if available → Modern CSS3 support
-- Qt WebKit is used as fallback → Legacy CSS support
+- Qt WebEngine is required; legacy WebKit is no longer packaged
 
 No configuration needed! The best available backend is selected automatically.
 
