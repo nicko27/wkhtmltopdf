@@ -38,11 +38,15 @@ public:
 	Outline(const settings::PdfGlobal & settings);
 	~Outline();
 	void addEmptyWebPage();
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	bool replaceWebPage(int d, const QString & name, QWebPrinter & wp, QWebFrame * f, const settings::PdfObject & ps, QVector<QPair<QWebElement, QString> > & local, QHash<QString, QWebElement> & anchors);
 	void addWebPage(const QString & name, QWebPrinter & wp, QWebFrame * frame, const settings::PdfObject & ps, QVector<QPair<QWebElement, QString> > & local, QHash<QString, QWebElement> & external);
+#endif
 
 	void fillHeaderFooterParms(int page, QHash<QString, QString> & parms, const settings::PdfObject & ps);
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	void fillAnchors(int d, QHash<QString, QWebElement> & anchors);
+#endif
 	int pageCount();
 	void printOutline(QPrinter * printer);
 

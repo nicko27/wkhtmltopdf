@@ -33,16 +33,20 @@ public:
 	uint page;
 	uint document;
 	QString value;
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	QWebElement element;
+#endif
 	QString anchor;
 	QString tocAnchor;
 	bool display;
 	bool forwardLinks;
 	bool backLinks;
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	void fillAnchors(const OutlineItem * other,
 					 int & anchorCounter,
 					 QVector<QPair<QWebElement, QString> > & local,
 					 QHash<QString, QWebElement> & anchors);
+#endif
 	bool differentFrom(const OutlineItem * other) const;
 	OutlineItem();
 	~OutlineItem();
@@ -62,7 +66,9 @@ public:
 	OutlinePrivate(const settings::PdfGlobal & settings);
 	~OutlinePrivate();
 	void buildPrefixSum();
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	void fillChildAnchors(OutlineItem * item, QHash<QString, QWebElement> & anchors);
+#endif
 	void outlineChildren(OutlineItem * item, QPrinter * printer, int level);
 	void buildHFCache(OutlineItem * i, int level);
 	void dumpChildren(QTextStream & stream, const QList<OutlineItem *> & items, int level) const;
