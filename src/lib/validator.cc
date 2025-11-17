@@ -3,6 +3,7 @@
 
 #include "validator.hh"
 #include <QRegularExpression>
+#include <QtGlobal>
 
 namespace wkhtmltopdf {
 
@@ -150,34 +151,10 @@ Validator::ValidationResult Validator::checkCSSCompatibility(const QString& css,
 
 // Check if feature is supported
 bool Validator::isFeatureSupported(CSSFeature feature, RenderBackend backend) {
-	if (backend == RenderBackend::WebEngine) {
-		// WebEngine supports all modern features
-		return true;
-	}
-
-	// WebKit has limited support
-	switch (feature) {
-	case CSSFeature::Flexbox:
-		return false; // Limited support in old WebKit
-	case CSSFeature::Grid:
-		return false; // Not supported
-	case CSSFeature::Transforms:
-		return true; // Basic support
-	case CSSFeature::Animations:
-		return true; // Basic support
-	case CSSFeature::Gradients:
-		return true; // Basic support
-	case CSSFeature::CustomProperties:
-		return false; // Not supported
-	case CSSFeature::CalcFunction:
-		return false; // Limited support
-	case CSSFeature::MediaQueries:
-		return true; // Supported
-	case CSSFeature::BackgroundBlendMode:
-		return false; // Not supported
-	default:
-		return false;
-	}
+        Q_UNUSED(backend);
+        Q_UNUSED(feature);
+        // WebEngine is the only supported backend and provides modern CSS support
+        return true;
 }
 
 // Get feature name
@@ -223,27 +200,23 @@ QStringList Validator::detectCSSFeatures(const QString& css) {
 
 // Get suggestion for feature
 QString Validator::getSuggestion(CSSFeature feature, RenderBackend currentBackend) {
-	QString backendName = currentBackend == RenderBackend::WebKit ? "WebKit" : "WebEngine";
-
-	switch (feature) {
-	case CSSFeature::Flexbox:
-	case CSSFeature::Grid:
-		return QString("Use --render-backend webengine for full %1 support").arg(featureName(feature));
-	case CSSFeature::Transforms:
-	case CSSFeature::Animations:
-		return QString("%1 has limited support in %2").arg(featureName(feature)).arg(backendName);
-	case CSSFeature::Gradients:
-		if (currentBackend == RenderBackend::WebKit) {
-			return "Basic gradients are supported, but complex gradients may not render correctly. Use WebEngine for best results.";
-		}
-		return QString();
-	case CSSFeature::CustomProperties:
-		return "CSS Variables are not supported in WebKit. Use WebEngine or use static values.";
-	case CSSFeature::CalcFunction:
-		return "calc() function has limited support in WebKit. Consider using fixed values or WebEngine.";
-	default:
-		return "Consider using WebEngine backend for better CSS3 support";
-	}
+        Q_UNUSED(currentBackend);
+        switch (feature) {
+        case CSSFeature::Flexbox:
+        case CSSFeature::Grid:
+                return QString("%1 is supported by the WebEngine backend.").arg(featureName(feature));
+        case CSSFeature::Transforms:
+        case CSSFeature::Animations:
+                return QString("%1 is supported by the WebEngine backend.").arg(featureName(feature));
+        case CSSFeature::Gradients:
+                return QString();
+        case CSSFeature::CustomProperties:
+                return "CSS Variables are supported in the WebEngine backend.";
+        case CSSFeature::CalcFunction:
+                return "calc() is supported in the WebEngine backend.";
+        default:
+                return QString();
+        }
 }
 
 } // namespace wkhtmltopdf

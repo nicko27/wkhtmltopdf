@@ -20,11 +20,6 @@
 
 #include "renderengine.hh"
 
-// Include backend-specific implementations
-#ifdef WKHTMLTOPDF_USE_WEBKIT
-#include "renderengine_webkit.hh"
-#endif
-
 #ifdef WKHTMLTOPDF_USE_WEBENGINE
 #include "renderengine_webengine.hh"
 #endif
@@ -33,7 +28,7 @@
 using namespace wkhtmltopdf;
 
 // Static default backend - will be set to best available on first access
-static RenderBackend s_defaultBackend = RenderBackend::WebKit;  // Placeholder, will be auto-detected
+static RenderBackend s_defaultBackend = RenderBackend::WebEngine;  // Placeholder, will be auto-detected
 static bool s_defaultBackendInitialized = false;
 
 // ElementInfo implementation
@@ -47,33 +42,24 @@ void ElementInfo::setAttribute(const QString & name, const QString & value) {
 
 // RenderPage factory method
 RenderPage * RenderPage::create(RenderBackend backend, const settings::Web & webSettings) {
-	switch (backend) {
-#ifdef WKHTMLTOPDF_USE_WEBKIT
-	case RenderBackend::WebKit:
-		return new WebKitRenderPage(webSettings);
-#endif
-
+        if (backend == RenderBackend::WebEngine) {
 #ifdef WKHTMLTOPDF_USE_WEBENGINE
-	case RenderBackend::WebEngine:
-		return new WebEngineRenderPage(webSettings);
+                return new WebEngineRenderPage(webSettings);
+#else
+                return nullptr;
 #endif
-
-	default:
-		return nullptr;
-	}
+        }
+        return nullptr;
 }
 
 // RenderEngineFactory implementation
 RenderBackend RenderEngineFactory::getBestAvailableBackend() {
-	// Prefer WebEngine (modern CSS support) over WebKit (legacy)
-	if (isBackendAvailable(RenderBackend::WebEngine)) {
-		return RenderBackend::WebEngine;
-	}
-	if (isBackendAvailable(RenderBackend::WebKit)) {
-		return RenderBackend::WebKit;
-	}
-	// Should never happen if at least one backend is compiled in
-	return RenderBackend::WebKit;
+        // Only WebEngine is supported
+        if (isBackendAvailable(RenderBackend::WebEngine)) {
+                return RenderBackend::WebEngine;
+        }
+        // Should never happen if the backend is compiled in
+        return RenderBackend::WebEngine;
 }
 
 RenderBackend RenderEngineFactory::defaultBackend() {
@@ -93,58 +79,39 @@ void RenderEngineFactory::setDefaultBackend(RenderBackend backend) {
 }
 
 QList<RenderBackend> RenderEngineFactory::availableBackends() {
-	QList<RenderBackend> backends;
-	if (isBackendAvailable(RenderBackend::WebKit)) {
-		backends.append(RenderBackend::WebKit);
-	}
-	if (isBackendAvailable(RenderBackend::WebEngine)) {
-		backends.append(RenderBackend::WebEngine);
-	}
-	return backends;
+        QList<RenderBackend> backends;
+        if (isBackendAvailable(RenderBackend::WebEngine)) {
+                backends.append(RenderBackend::WebEngine);
+        }
+        return backends;
 }
 
 bool RenderEngineFactory::isBackendAvailable(RenderBackend backend) {
-	switch (backend) {
-	case RenderBackend::WebKit:
-#ifdef WKHTMLTOPDF_USE_WEBKIT
-		return true;
-#else
-		return false;
-#endif
-
-	case RenderBackend::WebEngine:
+        switch (backend) {
+        case RenderBackend::WebEngine:
 #ifdef WKHTMLTOPDF_USE_WEBENGINE
-		return true;
+                return true;
 #else
-		return false;
+                return false;
 #endif
-
-	default:
-		return false;
-	}
+        }
+        return false;
 }
 
 QString RenderEngineFactory::backendName(RenderBackend backend) {
-	switch (backend) {
-	case RenderBackend::WebKit:
-		return "Qt WebKit (Legacy)";
-	case RenderBackend::WebEngine:
-		return "Qt WebEngine (Chromium)";
-	default:
+        switch (backend) {
+        case RenderBackend::WebEngine:
+                return "Qt WebEngine (Chromium)";
+        default:
 		return "Unknown";
 	}
 }
 
 QString RenderEngineFactory::backendCapabilities(RenderBackend backend) {
-	switch (backend) {
-	case RenderBackend::WebKit:
-		return "Qt WebKit based on WebKit from 2012. "
-		       "Limited CSS3 support. No flexbox or grid layout. "
-		       "Suitable for legacy HTML/CSS.";
-
-	case RenderBackend::WebEngine:
-		return "Qt WebEngine based on Chromium (Blink). "
-		       "Full modern CSS3 support including flexbox, grid, transforms, animations. "
+        switch (backend) {
+        case RenderBackend::WebEngine:
+                return "Qt WebEngine based on Chromium (Blink). "
+                       "Full modern CSS3 support including flexbox, grid, transforms, animations. "
 		       "Recommended for modern HTML/CSS.";
 
 	default:
