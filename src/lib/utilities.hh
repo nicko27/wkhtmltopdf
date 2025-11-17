@@ -29,6 +29,7 @@
 #include <QStyleOption>
 #include <QSvgRenderer>
 #include <QUrl>
+#include <QWidget>
 
 #include <dllbegin.inc>
 /**

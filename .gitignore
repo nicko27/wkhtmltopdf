@@ -22,3 +22,14 @@ Makefile.*
 *.o
 moc_*.*
 .qmake*
+
+# Build artifacts from build-deb.sh
+build-temp/
+*.deb
+wkhtmltopdf-qt5-webengine_*/
+wkhtmltopdf-qt6_*/
+lib/
+
+# Qt generated files
+ui_*.h
+*_plugin_import.cpp

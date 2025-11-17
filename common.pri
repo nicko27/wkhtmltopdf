@@ -26,36 +26,24 @@ RESOURCES    = $$PWD/wkhtmltopdf.qrc
 win32:      CONFIG += console
 win32-g++*: QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++
 
-# Backend selection
-# Set RENDER_BACKEND=webengine to use Qt WebEngine (modern CSS support)
-# Set RENDER_BACKEND=webkit to use Qt WebKit (legacy, default)
-# Set RENDER_BACKEND=both to include both backends
+# Installation base directory
+isEmpty(INSTALLBASE): INSTALLBASE = /usr/local
+
+# Backend selection - WebEngine ONLY (WebKit abandoned)
+# WebEngine provides modern Chromium engine with full CSS3/HTML5 support
 RENDER_BACKEND = $$(RENDER_BACKEND)
-isEmpty(RENDER_BACKEND): RENDER_BACKEND = webkit
+isEmpty(RENDER_BACKEND): RENDER_BACKEND = webengine
 
-# WebKit backend
-contains(RENDER_BACKEND, webkit)|contains(RENDER_BACKEND, both) {
-    DEFINES += WKHTMLTOPDF_USE_WEBKIT
-    QT += webkit network xmlpatterns svg
-    greaterThan(QT_MAJOR_VERSION, 4) {
-        QT += webkitwidgets
-        greaterThan(QT_MINOR_VERSION, 2): QT += printsupport
-    }
-}
-
-# WebEngine backend (modern Chromium with full CSS3 support)
-contains(RENDER_BACKEND, webengine)|contains(RENDER_BACKEND, both) {
+# WebEngine backend (Chromium with full CSS3 support)
+contains(RENDER_BACKEND, webengine) {
     greaterThan(QT_MAJOR_VERSION, 4) {
         DEFINES += WKHTMLTOPDF_USE_WEBENGINE
         QT += webenginewidgets webengine network xmlpatterns svg printsupport
     } else {
-        error("Qt WebEngine requires Qt 5.4 or later")
+        error("Qt WebEngine requires Qt 5 or later")
     }
-}
-
-# Ensure at least one backend is selected
-!contains(DEFINES, WKHTMLTOPDF_USE_WEBKIT):!contains(DEFINES, WKHTMLTOPDF_USE_WEBENGINE) {
-    error("No rendering backend selected. Set RENDER_BACKEND to webkit, webengine, or both")
+} else {
+    error("Only WebEngine backend is supported. WebKit has been abandoned. Set RENDER_BACKEND=webengine")
 }
 
 # version related information

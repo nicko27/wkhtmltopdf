@@ -11,4 +11,5 @@ Conflicts: wkhtmltopdf-webengine, wkhtmltopdf-webkit, wkhtmltopdf
 Provides: wkhtmltopdf
 Description: HTML to PDF converter with Qt6 WebEngine (v1.0.0)
  wkhtmltopdf Qt6 with Chromium 108+ rendering engine.
+ Template directory - actual package is created by build-deb.sh
 Installed-Size: 1192
