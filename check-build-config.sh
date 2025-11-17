@@ -23,9 +23,9 @@ echo -e "${GREEN}✓ Ubuntu Version:${NC} $UBUNTU_VERSION ($DISTRIB_CODENAME)"
 # Determine configuration
 if [[ "$UBUNTU_VERSION" == "22.04" ]]; then
     QT_VERSION="Qt5"
-    PACKAGE_NAME="wkhtmltopdf-webengine"
+    PACKAGE_NAME="wkhtmltopdf-qt5-webengine"
     QMAKE_CMD="qmake"
-    DEPS="qt5-default qtwebengine5-dev libqt5webenginewidgets5 libqt5webenginecore5 libqt5svg5-dev libqt5xmlpatterns5-dev"
+    DEPS="qtbase5-dev qt5-qmake qtwebengine5-dev libqt5webenginewidgets5 libqt5webenginecore5 libqt5svg5-dev libqt5xmlpatterns5-dev libqt5positioning5"
 elif [[ "$UBUNTU_VERSION" == "24.04" ]]; then
     QT_VERSION="Qt6"
     PACKAGE_NAME="wkhtmltopdf-qt6"

@@ -1,10 +1,26 @@
 # Guide de Build - wkhtmltopdf WebEngine
 
+## ⚠️ Problèmes Ubuntu 22.04 avec libwkhtmltox
+
+### Symptômes connus:
+- ❌ `error while loading shared libraries: libwkhtmltox.so.0: cannot open shared object file`
+- ❌ Package compilé pour Ubuntu 24.04 installé sur 22.04
+- ❌ libwkhtmltox.so.0 introuvable dans le cache ldconfig
+
+### Correctifs appliqués automatiquement:
+Le nouveau script `build-deb.sh` inclut tous les correctifs pour Ubuntu 22.04:
+
+✅ **Bibliothèque partagée incluse** - libwkhtmltox.so.0 empaquetée dans le .deb
+✅ **Configuration ldconfig automatique** - Crée `/etc/ld.so.conf.d/wkhtmltopdf.conf`
+✅ **Dépendances Qt5 complètes** - Toutes les libs Qt5 WebEngine requises
+✅ **Détection de conflits** - Supprime les packages incompatibles
+✅ **Vérification post-installation** - Test automatique après install
+
 ## Configuration automatique
 
 Le script `build-deb.sh` détecte automatiquement votre version Ubuntu et configure le build approprié:
 
-- **Ubuntu 22.04** → Qt5 WebEngine
+- **Ubuntu 22.04** → Qt5 WebEngine (avec correctifs libwkhtmltox)
 - **Ubuntu 24.04** → Qt6 WebEngine
 
 ## Prérequis
@@ -93,12 +109,53 @@ sudo apt remove wkhtmltopdf-qt6         # Pour Qt6 (24.04)
 
 ## Résolution de problèmes
 
+### ❌ Ubuntu 22.04: "libwkhtmltox.so.0: cannot open shared object file"
+
+**Cause**: La bibliothèque partagée n'est pas dans le cache ldconfig
+
+**Solution 1** (Recommandé): Utiliser le nouveau build-deb.sh
+```bash
+./build-deb.sh  # Applique automatiquement tous les correctifs
+sudo apt install ./wkhtmltopdf-qt5-webengine_0.13.0-22.04_*.deb
+```
+
+**Solution 2**: Correction manuelle si déjà installé
+```bash
+# Reconfigurer ldconfig
+sudo bash -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/wkhtmltopdf.conf'
+sudo ldconfig
+
+# Vérifier
+ldconfig -p | grep libwkhtmltox  # Doit afficher la bibliothèque
+wkhtmltopdf --version  # Doit fonctionner maintenant
+```
+
+**Solution 3**: Diagnostic complet
+```bash
+./diagnose-ubuntu2204.sh  # Analyse détaillée du problème
+./fix-ubuntu2204-qt5.sh   # Assistant de réparation interactif
+```
+
+### ❌ Package incompatible détecté
+
+**Symptôme**: Package ubuntu24.04 installé sur système 22.04
+
+**Solution**:
+```bash
+# Désinstaller les packages incompatibles
+sudo dpkg -r wkhtmltopdf-qt6 wkhtmltopdf-webengine
+
+# Recompiler pour Ubuntu 22.04
+./build-deb.sh
+sudo apt install ./wkhtmltopdf-qt5-webengine_0.13.0-22.04_*.deb
+```
+
 ### Erreur: "Cannot detect Ubuntu version"
 - Vérifiez que `/etc/lsb-release` existe
 - Exécutez: `lsb_release -a`
 
 ### Erreur: "qmake not found"
-- Ubuntu 22.04: Installez `qt5-default`
+- Ubuntu 22.04: Installez `qtbase5-dev qt5-qmake`
 - Ubuntu 24.04: Installez `qt6-base-dev`
 
 ### Erreur de compilation
@@ -110,6 +167,9 @@ sudo apt remove wkhtmltopdf-qt6         # Pour Qt6 (24.04)
 ```bash
 # Vérifier les dépendances manquantes
 ldd /usr/local/bin/wkhtmltopdf
+
+# Ubuntu 22.04: Vérifier libwkhtmltox
+ldconfig -p | grep libwkhtmltox
 
 # Installer les dépendances Qt manquantes
 sudo apt install --fix-broken
