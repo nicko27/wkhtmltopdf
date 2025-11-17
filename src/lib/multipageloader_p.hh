@@ -30,7 +30,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkCookieJar>
 #include <QNetworkReply>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebFrame>
+#endif
 
 #include "dllbegin.inc"
 namespace wkhtmltopdf {

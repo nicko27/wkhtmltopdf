@@ -26,7 +26,9 @@
 #include "pdf_c_bindings_p.hh"
 #include "utilities.hh"
 #include <QApplication>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebFrame>
+#endif
 
 #include <QHash>
 

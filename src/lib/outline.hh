@@ -22,8 +22,10 @@
 #define __OUTLINE_HH__
 
 #include "pdfsettings.hh"
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebElement>
 #include <QWebFrame>
+#endif
 
 #ifdef  __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
 #include "dllbegin.inc"

@@ -27,9 +27,11 @@
 #include <QPair>
 #include <QPrintEngine>
 #include <QTimer>
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 #include <QWebFrame>
 #include <QWebPage>
 #include <QWebSettings>
+#endif
 #include <QXmlQuery>
 #include <algorithm>
 #include <qapplication.h>
