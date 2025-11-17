@@ -121,6 +121,7 @@ public:
 
 };
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 class DLL_LOCAL PdfConverterPrivate: public ConverterPrivate {
 	Q_OBJECT
 public:
@@ -217,6 +218,24 @@ public slots:
 
 	virtual Converter & outer();
 };
+
+#else
+
+class DLL_LOCAL PdfConverterPrivate : public ConverterPrivate {
+        Q_OBJECT
+public:
+        PdfConverterPrivate(settings::PdfGlobal & s, PdfConverter & o);
+
+        settings::PdfGlobal & settings;
+        QByteArray outputData;
+
+private:
+        PdfConverter & out;
+        void clearResources();
+        void beginConvert();
+        Converter & outer();
+};
+#endif
 
 }
 #include "dllend.inc"

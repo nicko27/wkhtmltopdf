@@ -41,6 +41,75 @@
 #include <io.h>
 #endif
 
+#ifndef WKHTMLTOPDF_USE_WEBKIT
+
+#include "dllbegin.inc"
+using namespace wkhtmltopdf;
+using namespace wkhtmltopdf::settings;
+
+namespace wkhtmltopdf {
+
+PdfConverterPrivate::PdfConverterPrivate(settings::PdfGlobal & s, PdfConverter & o):
+        settings(s),
+        outputData(),
+        out(o) {
+        currentPhase = 0;
+        error = false;
+        errorCode = 0;
+        conversionDone = false;
+        phaseDescriptions << "Page loading" << "PDF rendering";
+}
+
+void PdfConverterPrivate::beginConvert() {
+        error = true;
+        conversionDone = true;
+        emit outer().error(QStringLiteral("PDF conversion requires the legacy Qt WebKit backend, which is no longer available in this WebEngine-only build."));
+        emit outer().finished(false);
+        qApp->exit(0);
+}
+
+void PdfConverterPrivate::clearResources() {}
+
+Converter & PdfConverterPrivate::outer() {
+        return out;
+}
+
+PdfConverter::PdfConverter(settings::PdfGlobal & globalSettings):
+        Converter(),
+        d(new PdfConverterPrivate(globalSettings, *this)) {}
+
+PdfConverter::~PdfConverter() {
+        delete d;
+}
+
+int PdfConverter::pageCount() {
+        return 0;
+}
+
+void PdfConverter::addResource(const settings::PdfObject &, const QString *) {
+        emit error(QStringLiteral("PDF conversion is unavailable without Qt WebKit support."));
+}
+
+const settings::PdfGlobal & PdfConverter::globalSettings() const {
+        return d->settings;
+}
+
+const QByteArray & PdfConverter::output() {
+        return d->outputData;
+}
+
+ConverterPrivate & PdfConverter::priv() {
+        return *d;
+}
+
+#endif // WKHTMLTOPDF_USE_WEBKIT
+
+}
+
+#include "dllend.inc"
+
+#else
+
 #include "dllbegin.inc"
 using namespace wkhtmltopdf;
 using namespace wkhtmltopdf::settings;
