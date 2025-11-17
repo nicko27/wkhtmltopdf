@@ -39,6 +39,7 @@
 #include <dllbegin.inc>
 namespace wkhtmltopdf {
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 class DLL_LOCAL MyQWebPage;
 
 class DLL_LOCAL LoaderObject {
@@ -48,6 +49,7 @@ public:
 
 	LoaderObject(QWebPage & page);
 };
+#endif
 
 class DLL_LOCAL MultiPageLoaderPrivate;
 class DLL_LOCAL MultiPageLoader: public QObject {

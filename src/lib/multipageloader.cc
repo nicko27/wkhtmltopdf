@@ -47,8 +47,9 @@ namespace wkhtmltopdf {
   \brief Defines the MultiPageLoaderPrivate class
 */
 
-
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 LoaderObject::LoaderObject(QWebPage & p): page(p), skip(false) {};
+#endif
 
 MyNetworkAccessManager::MyNetworkAccessManager(const settings::LoadPage & s):
 	disposed(false),
@@ -154,6 +155,7 @@ QList<QNetworkProxy> MyNetworkProxyFactory::queryProxy (const QNetworkProxyQuery
 	return originalProxy;
 }
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 MyQWebPage::MyQWebPage(ResourceObject & res): resource(res) {}
 
 void MyQWebPage::javaScriptAlert(QWebFrame *, const QString & msg) {
@@ -190,6 +192,7 @@ QString MyQWebPage::overrideMediaType() const
 {
     return resource.settings.printMediaType ? "print" : "screen";
 }
+#endif
 
 ResourceObject::ResourceObject(MultiPageLoaderPrivate & mpl, const QUrl & u, const settings::LoadPage & s):
 	networkAccessManager(s),

@@ -50,7 +50,9 @@ using namespace wkhtmltopdf::settings;
 
 const qreal PdfConverter::millimeterToPointMultiplier = 3.779527559;
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 DLL_LOCAL QMap<QWebPage *, PageObject *> PageObject::webPageToObject;
+#endif
 
 struct DLL_LOCAL StreamDumper {
 	QFile out;

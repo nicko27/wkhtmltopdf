@@ -49,11 +49,15 @@ namespace wkhtmltopdf {
 
 class DLL_LOCAL PageObject {
 public:
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	static QMap<QWebPage *, PageObject *> webPageToObject;
+#endif
 
 	settings::PdfObject settings;
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	LoaderObject * loaderObject;
 	QWebPage * page;
+#endif
 	QString data;
 	int number;
 
@@ -74,8 +78,10 @@ public:
 #endif
 
 	int firstPageNumber;
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	QList<QWebPage *> headers;
 	QList<QWebPage *> footers;
+#endif
 	int pageCount;
 	TempFile tocFile;
 
@@ -88,15 +94,20 @@ public:
 			delete web_printer;
 		web_printer=0;
 #endif
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 		headers.clear();
 		footers.clear();
 		webPageToObject.remove(page);
  		page=0;
+#endif
 		tocFile.removeAll();
 	}
 
 	PageObject(const settings::PdfObject & set, const QString * d=NULL):
-		settings(set), loaderObject(0), page(0)
+		settings(set)
+#ifdef WKHTMLTOPDF_USE_WEBKIT
+		, loaderObject(0), page(0)
+#endif
 #ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
 		, headerReserveHeight(0), footerReserveHeight(0), measuringHeader(0), measuringFooter(0), web_printer(0)
 #endif
@@ -168,13 +179,13 @@ private:
 	QString hfreplace(const QString & q, const QHash<QString, QString> & parms);
 	QWebPage * loadHeaderFooter(QString url, const QHash<QString, QString> & parms, const settings::PdfObject & ps);
     qreal calculateHeaderHeight(PageObject & object, QWebPage & header);
-
-#endif
 	QWebPage * currentHeader;
 	QWebPage * currentFooter;
+
+#endif
     QPrinter * createPrinter(const QString & tempFile);
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	void handleTocPage(PageObject & obj);
 	void preprocessPage(PageObject & obj);
 	void spoolPage(int page);
