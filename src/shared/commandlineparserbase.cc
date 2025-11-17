@@ -20,9 +20,6 @@
 
 #include "commandlineparserbase.hh"
 #include "outputter.hh"
-#ifdef WKHTMLTOPDF_USE_WEBKIT
-#include <qwebframe.h>
-#endif
 
 bool ahsort(const ArgHandler * a, const ArgHandler * b) {
 	QRegExp e("^(no|enable|disable|include-in|exclude-from)-");
