@@ -1,125 +1,306 @@
 #!/bin/bash
-# Script de génération de paquet .deb pour wkhtmltopdf 0.13.0
+# Script unifié de build pour wkhtmltopdf
+# - Ubuntu 22.04 → Qt5 WebKit ou WebEngine
+# - Ubuntu 24.04 → Qt6 WebEngine
 
 set -e
 
-VERSION="0.13.0"
-ARCH=$(dpkg --print-architecture 2>/dev/null || echo "amd64")
-PKG_NAME="wkhtmltopdf_${VERSION}_${ARCH}"
-BUILD_DIR="debian-build"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-echo "========================================="
-echo " Build paquet .deb wkhtmltopdf ${VERSION}"
-echo "========================================="
+echo "=========================================="
+echo "🚀 wkhtmltopdf - Build Debian Package"
+echo "=========================================="
 echo ""
 
-# Vérifier que les binaires sont compilés
-if [ ! -f "bin/wkhtmltopdf" ] || [ ! -f "bin/libwkhtmltox.so.0.12.7" ]; then
-    echo "❌ Erreur: Les binaires n'existent pas dans bin/"
-    echo ""
-    echo "Veuillez d'abord compiler le projet:"
-    echo "  ./rebuild.sh"
-    echo ""
+# Détection automatique
+UBUNTU_VERSION=$(lsb_release -rs 2>/dev/null || echo "unknown")
+ARCH=$(dpkg --print-architecture 2>/dev/null || uname -m)
+
+echo "Système détecté:"
+echo "  Ubuntu: $UBUNTU_VERSION"
+echo "  Architecture: $ARCH"
+echo ""
+
+# Vérifier qu'on est dans le bon répertoire
+if [ ! -f "wkhtmltopdf.pro" ]; then
+    echo -e "${RED}❌ Erreur: wkhtmltopdf.pro introuvable${NC}"
+    echo "Lancez ce script depuis le répertoire racine de wkhtmltopdf"
     exit 1
 fi
 
-# Nettoyer l'ancien build
-echo "[1/6] Nettoyage des anciens builds..."
-rm -rf "${BUILD_DIR}"
-rm -f wkhtmltopdf_*.deb
+# Configuration selon la version Ubuntu
+if [ "$UBUNTU_VERSION" = "22.04" ]; then
+    echo -e "${BLUE}📦 Configuration pour Ubuntu 22.04 (Jammy)${NC}"
+    QT_VERSION="5"
 
-# Créer la structure du paquet
-echo "[2/6] Création de la structure du paquet..."
-mkdir -p "${BUILD_DIR}/DEBIAN"
-mkdir -p "${BUILD_DIR}/usr/local/bin"
-mkdir -p "${BUILD_DIR}/usr/local/lib"
-mkdir -p "${BUILD_DIR}/usr/local/include/wkhtmltox"
-mkdir -p "${BUILD_DIR}/usr/share/doc/wkhtmltopdf"
-mkdir -p "${BUILD_DIR}/etc/ld.so.conf.d"
+    echo ""
+    echo "Quel backend Qt5 voulez-vous ?"
+    echo "1) webkit    - Petit (~40MB), rapide, CSS limité"
+    echo "2) webengine - Gros (~200MB), CSS moderne (Flexbox, Grid)"
+    read -p "Votre choix (1 ou 2): " CHOICE
 
-# Copier les fichiers de contrôle Debian
-echo "[3/6] Copie des métadonnées du paquet..."
-cp debian/DEBIAN/control "${BUILD_DIR}/DEBIAN/"
-cp debian/DEBIAN/postinst "${BUILD_DIR}/DEBIAN/"
-cp debian/DEBIAN/postrm "${BUILD_DIR}/DEBIAN/"
-chmod 755 "${BUILD_DIR}/DEBIAN/postinst" "${BUILD_DIR}/DEBIAN/postrm"
+    if [ "$CHOICE" = "1" ]; then
+        BACKEND="webkit"
+        PKG_NAME="wkhtmltopdf-qt5-webkit"
+        echo -e "${GREEN}→ Qt5 WebKit sélectionné${NC}"
+    else
+        BACKEND="webengine"
+        PKG_NAME="wkhtmltopdf-qt5-webengine"
+        echo -e "${GREEN}→ Qt5 WebEngine sélectionné${NC}"
+    fi
 
-# Mettre à jour l'architecture dans le fichier control
-sed -i "s/^Architecture:.*/Architecture: ${ARCH}/" "${BUILD_DIR}/DEBIAN/control"
+elif [ "$UBUNTU_VERSION" = "24.04" ]; then
+    echo -e "${BLUE}📦 Configuration pour Ubuntu 24.04 (Noble)${NC}"
+    QT_VERSION="6"
+    BACKEND="webengine"
+    PKG_NAME="wkhtmltopdf-qt6-webengine"
+    echo -e "${GREEN}→ Qt6 WebEngine (seule option)${NC}"
 
-# Copier la documentation
-cp debian/usr/share/doc/wkhtmltopdf/copyright "${BUILD_DIR}/usr/share/doc/wkhtmltopdf/"
-cp debian/usr/share/doc/wkhtmltopdf/changelog.Debian.gz "${BUILD_DIR}/usr/share/doc/wkhtmltopdf/"
+else
+    echo -e "${YELLOW}⚠ Version Ubuntu non reconnue: $UBUNTU_VERSION${NC}"
+    echo ""
+    echo "Veuillez choisir manuellement:"
+    echo "1) Qt5 WebKit (Ubuntu 22.04)"
+    echo "2) Qt5 WebEngine (Ubuntu 22.04)"
+    echo "3) Qt6 WebEngine (Ubuntu 24.04)"
+    read -p "Votre choix (1-3): " CHOICE
 
-# Copier les fichiers README
-cp README.md "${BUILD_DIR}/usr/share/doc/wkhtmltopdf/README"
-cp MULTI_BACKEND.md "${BUILD_DIR}/usr/share/doc/wkhtmltopdf/" 2>/dev/null || true
-cp AUTO_BACKEND_DETECTION.md "${BUILD_DIR}/usr/share/doc/wkhtmltopdf/" 2>/dev/null || true
-cp DEPENDENCIES.md "${BUILD_DIR}/usr/share/doc/wkhtmltopdf/" 2>/dev/null || true
-
-# Installer les binaires
-echo "[4/6] Installation des binaires..."
-install -m 755 bin/wkhtmltopdf "${BUILD_DIR}/usr/local/bin/"
-install -m 755 bin/wkhtmltoimage "${BUILD_DIR}/usr/local/bin/"
-
-# Installer les bibliothèques
-echo "[5/6] Installation des bibliothèques..."
-install -m 644 bin/libwkhtmltox.so.0.12.7 "${BUILD_DIR}/usr/local/lib/"
-ln -s libwkhtmltox.so.0.12.7 "${BUILD_DIR}/usr/local/lib/libwkhtmltox.so.0.12"
-ln -s libwkhtmltox.so.0.12.7 "${BUILD_DIR}/usr/local/lib/libwkhtmltox.so.0"
-ln -s libwkhtmltox.so.0.12.7 "${BUILD_DIR}/usr/local/lib/libwkhtmltox.so"
-
-# Installer les headers
-if [ -d "src/lib" ]; then
-    install -m 644 src/lib/pdf.h "${BUILD_DIR}/usr/local/include/wkhtmltox/" 2>/dev/null || true
-    install -m 644 src/lib/image.h "${BUILD_DIR}/usr/local/include/wkhtmltox/" 2>/dev/null || true
-    install -m 644 src/lib/dllbegin.inc "${BUILD_DIR}/usr/local/include/wkhtmltox/" 2>/dev/null || true
-    install -m 644 src/lib/dllend.inc "${BUILD_DIR}/usr/local/include/wkhtmltox/" 2>/dev/null || true
+    case $CHOICE in
+        1)
+            QT_VERSION="5"
+            BACKEND="webkit"
+            PKG_NAME="wkhtmltopdf-qt5-webkit"
+            ;;
+        2)
+            QT_VERSION="5"
+            BACKEND="webengine"
+            PKG_NAME="wkhtmltopdf-qt5-webengine"
+            ;;
+        3)
+            QT_VERSION="6"
+            BACKEND="webengine"
+            PKG_NAME="wkhtmltopdf-qt6-webengine"
+            ;;
+        *)
+            echo -e "${RED}Choix invalide${NC}"
+            exit 1
+            ;;
+    esac
 fi
 
-# Configurer ldconfig
-echo "/usr/local/lib" > "${BUILD_DIR}/etc/ld.so.conf.d/wkhtmltopdf.conf"
-
-# Calculer la taille installée
-INSTALLED_SIZE=$(du -sk "${BUILD_DIR}/usr" | cut -f1)
-echo "Installed-Size: ${INSTALLED_SIZE}" >> "${BUILD_DIR}/DEBIAN/control"
-
-# Afficher les informations du paquet
 echo ""
-echo "Informations du paquet:"
-echo "  Nom:         wkhtmltopdf"
-echo "  Version:     ${VERSION}"
-echo "  Architecture: ${ARCH}"
-echo "  Taille:      ${INSTALLED_SIZE} KB"
+echo "Configuration finale:"
+echo "  Qt Version: $QT_VERSION"
+echo "  Backend: $BACKEND"
+echo "  Package: $PKG_NAME"
 echo ""
 
-# Construire le paquet
-echo "[6/6] Construction du paquet .deb..."
-dpkg-deb --build "${BUILD_DIR}" "${PKG_NAME}.deb"
-
-# Vérifier le paquet
-echo ""
-echo "========================================="
-echo " ✓ Paquet créé avec succès!"
-echo "========================================="
-echo ""
-echo "Fichier: ${PKG_NAME}.deb"
+# Installation des dépendances
+echo -e "${BLUE}[1/7] Vérification des dépendances...${NC}"
 echo ""
 
-# Afficher les informations du paquet
-echo "Informations du paquet:"
-dpkg-deb --info "${PKG_NAME}.deb"
+MISSING_DEPS=()
+
+if [ "$QT_VERSION" = "5" ]; then
+    # Dépendances Qt5
+    DEPS="build-essential qt5-qmake qtbase5-dev libqt5core5a libqt5gui5 libqt5network5 libqt5svg5 libqt5xmlpatterns5"
+
+    if [ "$BACKEND" = "webkit" ]; then
+        DEPS="$DEPS libqt5webkit5 libqt5webkit5-dev"
+    else
+        DEPS="$DEPS qtwebengine5-dev libqt5webenginecore5 libqt5webenginewidgets5 libqt5printsupport5 libqt5positioning5"
+    fi
+else
+    # Dépendances Qt6
+    DEPS="build-essential qt6-base-dev qt6-webengine-dev libqt6core6 libqt6gui6 libqt6webenginecore6 libqt6webenginewidgets6"
+fi
+
+DEPS="$DEPS libssl-dev libfontconfig1-dev libfreetype6-dev libx11-dev libxrender-dev libxext-dev"
+
+for dep in $DEPS; do
+    if ! dpkg -l | grep -q "^ii  $dep "; then
+        MISSING_DEPS+=("$dep")
+    fi
+done
+
+if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
+    echo -e "${YELLOW}Dépendances manquantes:${NC}"
+    echo "  ${MISSING_DEPS[@]}"
+    echo ""
+    read -p "Installer automatiquement? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        sudo apt-get update
+        sudo apt-get install -y ${MISSING_DEPS[@]}
+    else
+        echo -e "${RED}Installation annulée. Installez les dépendances manuellement.${NC}"
+        exit 1
+    fi
+fi
+
+echo -e "${GREEN}✓ Toutes les dépendances sont installées${NC}"
+echo ""
+
+# Nettoyage
+echo -e "${BLUE}[2/7] Nettoyage du build précédent...${NC}"
+make distclean 2>/dev/null || true
+rm -rf bin/ lib/ build/ .qmake.stash Makefile */Makefile */*/Makefile
+rm -rf moc_* ui_* qrc_* *.o */*.o */*/*.o
+rm -rf debian-build-*/
+echo -e "${GREEN}✓ Nettoyage terminé${NC}"
+echo ""
+
+# Préparation
+echo -e "${BLUE}[3/7] Préparation des répertoires...${NC}"
+mkdir -p bin lib
+echo -e "${GREEN}✓ Répertoires créés${NC}"
+echo ""
+
+# Configuration
+echo -e "${BLUE}[4/7] Configuration avec qmake...${NC}"
+
+if [ "$QT_VERSION" = "5" ]; then
+    QMAKE="qmake"
+else
+    QMAKE="qmake6"
+fi
+
+if ! command -v $QMAKE &> /dev/null; then
+    echo -e "${RED}❌ $QMAKE introuvable${NC}"
+    exit 1
+fi
+
+export RENDER_BACKEND=$BACKEND
+if ! $QMAKE; then
+    echo -e "${RED}❌ Configuration échouée${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Configuration réussie${NC}"
+echo ""
+
+# Compilation de la bibliothèque
+echo -e "${BLUE}[5/7] Compilation de libwkhtmltox...${NC}"
+cd src/lib
+if ! make -j$(nproc); then
+    echo -e "${RED}❌ Compilation de la bibliothèque échouée${NC}"
+    exit 1
+fi
+cd ../..
+
+if [ ! -f "bin/libwkhtmltox.so" ] && [ ! -f "bin/libwkhtmltox.so.0" ]; then
+    echo -e "${RED}❌ libwkhtmltox.so non créée${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Bibliothèque compilée${NC}"
+echo ""
+
+# Compilation des exécutables
+echo -e "${BLUE}[6/7] Compilation des exécutables...${NC}"
+cd src/pdf && make -j$(nproc) && cd ../..
+cd src/image && make -j$(nproc) && cd ../..
+echo -e "${GREEN}✓ Exécutables compilés${NC}"
+echo ""
+
+# Création du package Debian
+echo -e "${BLUE}[7/7] Création du package Debian...${NC}"
+
+VERSION="0.13.0"
+BUILD_DIR="debian-build-${PKG_NAME}"
+DEB_FILE="${PKG_NAME}_${VERSION}-ubuntu${UBUNTU_VERSION}_${ARCH}.deb"
+
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR/DEBIAN"
+mkdir -p "$BUILD_DIR/usr/local/bin"
+mkdir -p "$BUILD_DIR/usr/local/lib"
+mkdir -p "$BUILD_DIR/usr/local/include/wkhtmltox"
+mkdir -p "$BUILD_DIR/etc/ld.so.conf.d"
+
+# Fichier control
+cat > "$BUILD_DIR/DEBIAN/control" << EOF
+Package: $PKG_NAME
+Version: $VERSION-ubuntu$UBUNTU_VERSION
+Section: utils
+Priority: optional
+Architecture: $ARCH
+Maintainer: wkhtmltopdf Team <support@wkhtmltopdf.org>
+Homepage: https://wkhtmltopdf.org
+EOF
+
+# Dépendances selon la configuration
+if [ "$QT_VERSION" = "5" ] && [ "$BACKEND" = "webkit" ]; then
+    cat >> "$BUILD_DIR/DEBIAN/control" << EOF
+Depends: libqt5core5a, libqt5gui5, libqt5network5, libqt5svg5, libqt5xmlpatterns5, libqt5webkit5, libssl3, libfontconfig1, libfreetype6, libx11-6, libxrender1, libxext6, libc6
+Description: HTML to PDF converter - Qt5 WebKit
+ Lightweight version with Qt5 WebKit backend.
+ Package size: ~40MB
+ CSS support: Basic (CSS 2.1 + partial CSS3)
+EOF
+
+elif [ "$QT_VERSION" = "5" ] && [ "$BACKEND" = "webengine" ]; then
+    cat >> "$BUILD_DIR/DEBIAN/control" << EOF
+Depends: libqt5core5a, libqt5gui5, libqt5network5, libqt5svg5, libqt5xmlpatterns5, libqt5webenginecore5, libqt5webenginewidgets5, libqt5printsupport5, libqt5positioning5, libssl3, libfontconfig1, libfreetype6, libx11-6, libxrender1, libxext6, libc6, libnss3, libxcomposite1, libxcursor1, libxdamage1, libxi6, libxtst6
+Description: HTML to PDF converter - Qt5 WebEngine
+ Modern version with Qt5 WebEngine (Chromium) backend.
+ Package size: ~200MB
+ CSS support: Full CSS3 (Flexbox, Grid, Transforms)
+EOF
+
+else
+    cat >> "$BUILD_DIR/DEBIAN/control" << EOF
+Depends: libqt6core6, libqt6gui6, libqt6network6, libqt6webenginecore6, libqt6webenginewidgets6, libqt6printsupport6, libssl3, libfontconfig1, libfreetype6, libx11-6, libxrender1, libxext6, libc6, libnss3, libxcomposite1, libxcursor1, libxdamage1, libxi6, libxtst6
+Description: HTML to PDF converter - Qt6 WebEngine
+ Latest version with Qt6 WebEngine (Chromium) backend.
+ Package size: ~200MB
+ CSS support: Full CSS3 (Flexbox, Grid, Transforms)
+EOF
+fi
+
+# Copier les fichiers
+echo "Copie des binaires..."
+cp -a bin/wkhtmltopdf "$BUILD_DIR/usr/local/bin/"
+cp -a bin/wkhtmltoimage "$BUILD_DIR/usr/local/bin/"
+cp -a bin/libwkhtmltox.so* "$BUILD_DIR/usr/local/lib/" 2>/dev/null || true
+
+# Headers
+cp -a include/wkhtmltox/*.h "$BUILD_DIR/usr/local/include/wkhtmltox/" 2>/dev/null || true
+
+# Configuration ldconfig
+echo "/usr/local/lib" > "$BUILD_DIR/etc/ld.so.conf.d/wkhtmltopdf.conf"
+
+# Permissions
+chmod 755 "$BUILD_DIR/usr/local/bin/"*
+chmod 644 "$BUILD_DIR/usr/local/lib/"*
+
+# Script postinst
+cat > "$BUILD_DIR/DEBIAN/postinst" << 'EOFPOST'
+#!/bin/bash
+ldconfig
+EOFPOST
+chmod 755 "$BUILD_DIR/DEBIAN/postinst"
+
+# Construire le .deb
+dpkg-deb --build "$BUILD_DIR" "$DEB_FILE"
 
 echo ""
-echo "Contenu du paquet (premiers fichiers):"
-dpkg-deb --contents "${PKG_NAME}.deb" 2>/dev/null | head -20 || true
-
+echo "=========================================="
+echo -e "${GREEN}✅ BUILD RÉUSSI!${NC}"
+echo "=========================================="
 echo ""
-echo "Pour installer:"
-echo "  sudo dpkg -i ${PKG_NAME}.deb"
-echo "  sudo apt-get install -f  # Installer les dépendances manquantes"
+echo "Package créé: $DEB_FILE"
+ls -lh "$DEB_FILE"
 echo ""
-echo "Pour vérifier:"
-echo "  dpkg -L wkhtmltopdf      # Lister les fichiers installés"
-echo "  wkhtmltopdf --version    # Tester l'installation"
+echo -e "${BLUE}Pour installer:${NC}"
+echo "  sudo dpkg -i $DEB_FILE"
+echo "  sudo apt-get install -f"
+echo ""
+echo -e "${BLUE}Pour tester:${NC}"
+echo "  wkhtmltopdf --version"
+echo "  echo '<h1>Test</h1>' > test.html"
+echo "  wkhtmltopdf test.html test.pdf"
 echo ""
