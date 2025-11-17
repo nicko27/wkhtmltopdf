@@ -65,16 +65,22 @@ ImageConverterPrivate::ImageConverterPrivate(ImageConverter & o, wkhtmltopdf::se
 }
 
 void ImageConverterPrivate::beginConvert() {
-	error = false;
-	conversionDone = false;
-	errorCode = 0;
-	progressString = "0%";
-	loaderObject = loader.addResource(settings.in, settings.loadPage, &inputData);
-	updateWebSettings(loaderObject->page.settings(), settings.web);
-	currentPhase=0;
-	emit out. phaseChanged();
-	loadProgress(0);
-	loader.load();
+        error = false;
+        conversionDone = false;
+        errorCode = 0;
+        progressString = "0%";
+#ifndef WKHTMLTOPDF_USE_WEBKIT
+        emit out.error("Image conversion requires the legacy WebKit backend, which is no longer available in WebEngine-only builds.");
+        fail();
+        return;
+#else
+        loaderObject = loader.addResource(settings.in, settings.loadPage, &inputData);
+        updateWebSettings(loaderObject->page.settings(), settings.web);
+        currentPhase=0;
+        emit out. phaseChanged();
+        loadProgress(0);
+        loader.load();
+#endif
 }
 
 
