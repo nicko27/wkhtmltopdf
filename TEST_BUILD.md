@@ -54,6 +54,24 @@ sudo apt-get install -y \
     build-essential
 ```
 
+### Compilation rapide (sans packaging)
+
+Une fois les dépendances installées, vous pouvez vérifier que la compilation fonctionne sans générer de paquet :
+
+#### Ubuntu 22.04 (Qt5)
+```bash
+qmake RENDER_BACKEND=webengine wkhtmltopdf.pro
+make -j"$(nproc)"
+./bin/wkhtmltopdf --version
+```
+
+#### Ubuntu 24.04 (Qt6)
+```bash
+qmake6 RENDER_BACKEND=webengine wkhtmltopdf.pro
+make -j"$(nproc)"
+./bin/wkhtmltopdf --version
+```
+
 ## Utilisation
 
 ### Build automatique avec .deb

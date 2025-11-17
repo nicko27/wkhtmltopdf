@@ -15,11 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with wkhtmltopdf.  If not, see <http:#www.gnu.org/licenses/>.
 
-CONFIG(static, shared|static):lessThan(QT_MAJOR_VERSION, 5) {
-    DEFINES  += QT4_STATICPLUGIN_TEXTCODECS
-    QTPLUGIN += qcncodecs qjpcodecs qkrcodecs qtwcodecs
-}
-
 INCLUDEPATH += ../../src/lib
 RESOURCES    = $$PWD/wkhtmltopdf.qrc
 

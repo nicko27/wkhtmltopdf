@@ -20,9 +20,6 @@
 
 #include "outputter.hh"
 #include "pdfcommandlineparser.hh"
-#ifdef WKHTMLTOPDF_USE_WEBKIT
-#include <QWebFrame>
-#endif
 #include <renderengine.hh>
 
 #define STRINGIZE_(x) #x

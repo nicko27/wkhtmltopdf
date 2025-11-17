@@ -33,3 +33,6 @@ lib/
 # Qt generated files
 ui_*.h
 *_plugin_import.cpp
+
+# Local JavaScript dependencies for test wrapper
+playwright-wrapper/node_modules/

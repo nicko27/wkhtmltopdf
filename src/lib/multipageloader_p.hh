@@ -153,12 +153,14 @@ public:
 	TempFile tempIn;
 	int dpi;
 
-	MultiPageLoaderPrivate(const settings::LoadGlobal & settings, int dpi, MultiPageLoader & o);
-	~MultiPageLoaderPrivate();
-	LoaderObject * addResource(const QUrl & url, const settings::LoadPage & settings);
-	void load();
-	void clearResources();
-	void cancel();
+        MultiPageLoaderPrivate(const settings::LoadGlobal & settings, int dpi, MultiPageLoader & o);
+        ~MultiPageLoaderPrivate();
+#ifdef WKHTMLTOPDF_USE_WEBKIT
+        LoaderObject * addResource(const QUrl & url, const settings::LoadPage & settings);
+#endif
+        void load();
+        void clearResources();
+        void cancel();
 public slots:
 	void fail();
 	void loadDone();
