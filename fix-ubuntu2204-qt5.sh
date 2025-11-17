@@ -155,13 +155,14 @@ case $CHOICE in
         ;;
 
     3|4)
-        BACKEND="webkit"
-        if [ "$CHOICE" = "4" ]; then
-            BACKEND="webengine"
+        BACKEND="webengine"
+        if [ "$CHOICE" = "3" ]; then
+            echo ""
+            echo -e "${YELLOW}⚠ WebKit est abandonné. Utilisation de WebEngine.${NC}"
         fi
 
         echo ""
-        echo -e "${BLUE}🔨 Compilation de wkhtmltopdf Qt5 $BACKEND pour Ubuntu 22.04...${NC}"
+        echo -e "${BLUE}🔨 Compilation de wkhtmltopdf Qt5 WebEngine pour Ubuntu 22.04...${NC}"
         echo ""
 
         # Vérifier qu'on est dans le bon répertoire
@@ -171,147 +172,87 @@ case $CHOICE in
             exit 1
         fi
 
-        # Nettoyer les anciens builds
-        echo "Nettoyage des anciens builds..."
-        make distclean 2>/dev/null || true
-        rm -rf bin/ lib/ debian-build-*/ moc_* ui_* *.o 2>/dev/null || true
-
-        # Configuration
-        echo ""
-        echo "Configuration pour Qt5 $BACKEND..."
-        RENDER_BACKEND=$BACKEND qmake
-
-        # Compilation
-        echo ""
-        echo "Compilation (cela peut prendre plusieurs minutes)..."
-        make clean
-        make -j$(nproc)
-
-        # Vérifier que la compilation a réussi
-        if [ ! -f "bin/wkhtmltopdf" ]; then
-            echo -e "${RED}❌ Erreur: La compilation a échoué${NC}"
+        if [ ! -f "build-deb.sh" ]; then
+            echo -e "${RED}❌ Erreur: build-deb.sh introuvable${NC}"
+            echo "Ce script nécessite le nouveau build-deb.sh"
             exit 1
         fi
 
+        # Utiliser le nouveau script build-deb.sh
         echo ""
-        echo -e "${GREEN}✅ Compilation réussie!${NC}"
+        echo -e "${GREEN}Utilisation du script build-deb.sh (applique tous les correctifs Ubuntu 22.04)${NC}"
         echo ""
-        echo "Binaire créé: bin/wkhtmltopdf"
 
-        # Créer le package Debian
+        ./build-deb.sh
+
         echo ""
-        read -p "Créer un package .deb pour Ubuntu 22.04? (y/N) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "${GREEN}✅ Build terminé!${NC}"
+        echo ""
+
+        # Proposer l'installation
+        DEB_FILE=$(ls wkhtmltopdf-qt5-webengine_0.13.0-22.04_*.deb 2>/dev/null | head -1)
+        if [ -n "$DEB_FILE" ]; then
+            echo "Package créé: $DEB_FILE"
             echo ""
-            echo "Création du package Debian..."
-
-            if [ -f "./build-deb-variants.sh" ]; then
-                ./build-deb-variants.sh
-            else
-                echo -e "${YELLOW}⚠ Script build-deb-variants.sh introuvable${NC}"
-                echo "Installation directe avec make install..."
-                $SUDO make install
-                $SUDO ldconfig
-            fi
-        fi
-
-        # Installer le package ou les binaires
-        echo ""
-        read -p "Installer maintenant? (y/N) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            if [ -f "debian-build-qt5-$BACKEND"/*.deb ]; then
+            read -p "Installer maintenant? (y/N) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
                 echo "Installation du package .deb..."
-                $SUDO dpkg -i debian-build-qt5-$BACKEND/*.deb
-                $SUDO apt-get install -f -y  # Résoudre les dépendances
-                $SUDO ldconfig
-            else
-                echo "Installation avec make install..."
-                $SUDO make install
-                $SUDO ldconfig
-            fi
+                $SUDO apt install "./$DEB_FILE"
 
-            echo ""
-            echo -e "${GREEN}✅ Installation terminée!${NC}"
-            echo ""
-            echo "Test de la version:"
-            wkhtmltopdf --version
+                echo ""
+                echo -e "${GREEN}✅ Installation terminée!${NC}"
+                echo ""
+                echo "Vérification:"
+                wkhtmltopdf --version
+                echo ""
+                ldconfig -p | grep libwkhtmltox
+            fi
+        else
+            echo -e "${RED}❌ Package .deb non trouvé${NC}"
         fi
         ;;
 
     5)
         echo ""
-        echo -e "${BLUE}🚀 Installation complète pour Ubuntu 22.04${NC}"
+        echo -e "${BLUE}🚀 Installation complète pour Ubuntu 22.04 (WebEngine uniquement)${NC}"
         echo ""
 
-        # Demander quel backend
-        echo "Quel backend voulez-vous?"
-        echo "1) WebKit (petit, rapide, CSS limité)"
-        echo "2) WebEngine (gros, CSS moderne)"
-        read -p "Votre choix (1 ou 2): " BACKEND_CHOICE
-
-        if [ "$BACKEND_CHOICE" = "1" ]; then
-            BACKEND="webkit"
-        else
-            BACKEND="webengine"
+        # Vérifier qu'on a le nouveau script
+        if [ ! -f "build-deb.sh" ]; then
+            echo -e "${RED}❌ Erreur: build-deb.sh introuvable${NC}"
+            echo "Ce script nécessite le nouveau build-deb.sh"
+            exit 1
         fi
 
         # Étape 1: Désinstaller les anciens packages
         echo ""
-        echo -e "${YELLOW}[1/5] Nettoyage des anciens packages...${NC}"
-        $SUDO dpkg -r wkhtmltopdf wkhtmltopdf-webkit wkhtmltopdf-webengine 2>/dev/null || true
+        echo -e "${YELLOW}[1/3] Nettoyage des anciens packages...${NC}"
+        $SUDO dpkg -r wkhtmltopdf wkhtmltopdf-webkit wkhtmltopdf-webengine wkhtmltopdf-qt5-webkit wkhtmltopdf-qt5-webengine wkhtmltopdf-qt6 2>/dev/null || true
 
-        # Étape 2: Installer les dépendances
+        # Étape 2: Build avec le nouveau script (qui installe les dépendances)
         echo ""
-        echo -e "${YELLOW}[2/5] Installation des dépendances...${NC}"
-        $SUDO apt-get update
-        $SUDO apt-get install -y \
-            build-essential cmake qt5-qmake qtbase5-dev \
-            libqt5core5a libqt5gui5 libqt5network5 libqt5svg5 \
-            libqt5xmlpatterns5 libqt5printsupport5 \
-            libssl3 libssl-dev libfontconfig1 libfreetype6 \
-            libx11-6 libxrender1 libxext6 libnss3
+        echo -e "${YELLOW}[2/3] Build avec tous les correctifs Ubuntu 22.04...${NC}"
+        ./build-deb.sh
 
-        if [ "$BACKEND" = "webkit" ]; then
-            $SUDO apt-get install -y libqt5webkit5 libqt5webkit5-dev
+        # Étape 3: Installation
+        echo ""
+        echo -e "${YELLOW}[3/3] Installation...${NC}"
+        DEB_FILE=$(ls wkhtmltopdf-qt5-webengine_0.13.0-22.04_*.deb 2>/dev/null | head -1)
+        if [ -n "$DEB_FILE" ]; then
+            $SUDO apt install "./$DEB_FILE"
         else
-            $SUDO apt-get install -y qtwebengine5-dev libqt5webenginecore5 \
-                libqt5webenginewidgets5 libqt5positioning5 \
-                libxcomposite1 libxcursor1 libxdamage1 libxi6 libxtst6
+            echo -e "${RED}❌ Package .deb non trouvé${NC}"
+            exit 1
         fi
-
-        # Étape 3: Compilation
-        echo ""
-        echo -e "${YELLOW}[3/5] Compilation de wkhtmltopdf...${NC}"
-        make distclean 2>/dev/null || true
-        RENDER_BACKEND=$BACKEND qmake
-        make clean
-        make -j$(nproc)
-
-        # Étape 4: Création du package
-        echo ""
-        echo -e "${YELLOW}[4/5] Création du package Debian...${NC}"
-        if [ -f "./build-deb-variants.sh" ]; then
-            ./build-deb-variants.sh
-        fi
-
-        # Étape 5: Installation
-        echo ""
-        echo -e "${YELLOW}[5/5] Installation...${NC}"
-        if [ -f "debian-build-qt5-$BACKEND"/*.deb ]; then
-            $SUDO dpkg -i debian-build-qt5-$BACKEND/*.deb
-            $SUDO apt-get install -f -y
-        else
-            $SUDO make install
-        fi
-        $SUDO ldconfig
 
         echo ""
         echo -e "${GREEN}✅ Installation complète terminée!${NC}"
         echo ""
         echo "Vérification:"
         wkhtmltopdf --version
+        echo ""
+        ldconfig -p | grep libwkhtmltox
         ;;
 
     6)

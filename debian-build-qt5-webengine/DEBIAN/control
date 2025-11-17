@@ -1,5 +1,5 @@
-Package: wkhtmltopdf-webengine
-Version: 0.13.0-ubuntu24.04
+Package: wkhtmltopdf-qt5-webengine
+Version: 0.13.0-ubuntu22.04
 Section: utils
 Priority: optional
 Architecture: arm64
@@ -11,4 +11,5 @@ Conflicts: wkhtmltopdf-webkit, wkhtmltopdf, wkhtmltopdf-qt6
 Provides: wkhtmltopdf
 Description: HTML to PDF converter with Qt5 WebEngine (v0.13.0)
  wkhtmltopdf with Chromium 87 rendering engine and modern CSS support.
+ Template directory - actual package is created by build-deb.sh
 Installed-Size: 1192

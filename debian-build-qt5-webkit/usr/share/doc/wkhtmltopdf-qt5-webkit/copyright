@@ -1,6 +1,0 @@
-Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: wkhtmltopdf
-Source: https://github.com/wkhtmltopdf/wkhtmltopdf
-Files: *
-Copyright: 2010-2020 wkhtmltopdf authors
-License: LGPL-3+

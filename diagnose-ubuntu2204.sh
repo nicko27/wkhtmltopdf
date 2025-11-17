@@ -152,6 +152,7 @@ WKHTML_PACKAGES=(
     "wkhtmltopdf-qt5-webengine"
     "wkhtmltopdf-qt6"
 )
+echo -e "${YELLOW}   Note: Le package recommandé pour Ubuntu 22.04 est wkhtmltopdf-qt5-webengine${NC}"
 
 INSTALLED_PACKAGES=()
 for pkg in "${WKHTML_PACKAGES[@]}"; do
@@ -216,11 +217,9 @@ if [ ${#INSTALLED_PACKAGES[@]} -gt 0 ]; then
             echo ""
             echo -e "${YELLOW}SOLUTION 1 - Désinstaller et recompiler pour Ubuntu 22.04:${NC}"
             echo "   sudo dpkg -r $pkg"
-            echo "   cd /home/user/wkhtmltopdf"
-            echo "   RENDER_BACKEND=webkit qmake  # ou webengine"
-            echo "   make clean && make -j\$(nproc)"
-            echo "   ./build-deb-variants.sh"
-            echo "   sudo dpkg -i debian-build-qt5-webkit/*.deb  # ou qt5-webengine"
+            echo "   cd /path/to/wkhtmltopdf"
+            echo "   ./build-deb.sh  # Auto-détecte Ubuntu 22.04 et compile Qt5 WebEngine"
+            echo "   sudo apt install ./wkhtmltopdf-qt5-webengine_0.13.0-22.04_*.deb"
             echo ""
             ISSUES=1
         fi
