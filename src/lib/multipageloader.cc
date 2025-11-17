@@ -203,8 +203,10 @@ ResourceObject::ResourceObject(MultiPageLoaderPrivate & mpl, const QUrl & u, con
 	finished(false),
 	signalPrint(false),
 	multiPageLoader(mpl),
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	webPage(*this),
 	lo(webPage),
+#endif
 	httpErrorCode(0),
 	settings(s) {
 
@@ -215,10 +217,12 @@ ResourceObject::ResourceObject(MultiPageLoaderPrivate & mpl, const QUrl & u, con
 	if (url.scheme() == "file")
 		networkAccessManager.allow(url.toLocalFile());
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	connect(&webPage, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
 	connect(&webPage, SIGNAL(loadProgress(int)), this, SLOT(loadProgress(int)));
 	connect(&webPage, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 	connect(&webPage, SIGNAL(printRequested(QWebFrame*)), this, SLOT(printRequested(QWebFrame*)));
+#endif
 
 	//If some ssl error occurs we want sslErrors to be called, so the we can ignore it
 	connect(&networkAccessManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)),this,
@@ -265,11 +269,13 @@ ResourceObject::ResourceObject(MultiPageLoaderPrivate & mpl, const QUrl & u, con
 			networkAccessManager.setProxy(proxy);
 	}
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	webPage.setNetworkAccessManager(&networkAccessManager);
 #ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
 	double devicePixelRatio = multiPageLoader.dpi / 96.; // The used version of WebKit always renders at 96 DPI when no zoom is applied. It does not fully support a device pixel ratio != 1 natively.
 	webPage.mainFrame()->setZoomFactor(devicePixelRatio * settings.zoomFactor); // Zoom in the page to achieve a higher DPI.
 	webPage.setDevicePixelRatio(devicePixelRatio); // Fix CSS media queries (does not affect anything else).
+#endif
 #endif
 }
 
@@ -324,7 +330,9 @@ void ResourceObject::loadFinished(bool ok) {
 			error(QString("Failed loading page ") + url.toString() + " (sometimes it will work just to ignore this error with --load-error-handling ignore)");
 		else if (settings.loadErrorHandling == settings::LoadPage::skip) {
 			warning(QString("Failed loading page ") + url.toString() + " (skipped)");
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 			lo.skip = true;
+#endif
 		} else
 			warning(QString("Failed loading page ") + url.toString() + " (ignored)");
 	}
@@ -332,9 +340,11 @@ void ResourceObject::loadFinished(bool ok) {
 	bool isMain = multiPageLoader.isMainLoader;
 
 	// Evaluate extra user supplied javascript for the main loader
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	if (isMain)
 		foreach (const QString & str, settings.runScript)
 			webPage.mainFrame()->evaluateJavaScript(str);
+#endif
 
 	// XXX: If loading failed there's no need to wait
 	//      for javascript on this resource.
@@ -344,7 +354,11 @@ void ResourceObject::loadFinished(bool ok) {
 }
 
 void ResourceObject::waitWindowStatus() {
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	QString windowStatus = webPage.mainFrame()->evaluateJavaScript("window.status").toString();
+#else
+	QString windowStatus = "";
+#endif
 	if (windowStatus != settings.windowStatus) {
 		// This is once a second
 		if ((++windowStatusCounter % 20) == 0) {
@@ -371,8 +385,10 @@ void ResourceObject::loadDone() {
 	debug("Loading done; Stopping QWebPage and any possible page refreshes.");
 
 	// Ensure no more loading goes..
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	webPage.triggerAction(QWebPage::Stop);
 	webPage.triggerAction(QWebPage::StopScheduledPageRefresh);
+#endif
 	networkAccessManager.dispose();
 	//disconnect(this, 0, 0, 0);
 
@@ -539,6 +555,7 @@ void ResourceObject::load() {
 	foreach (const HT & j, settings.customHeaders)
 		r.setRawHeader(j.first.toLatin1(), j.second.toLatin1());
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	if (postData.isEmpty())
 		webPage.mainFrame()->load(r);
 	else {
@@ -546,6 +563,7 @@ void ResourceObject::load() {
 			r.setHeader(QNetworkRequest::ContentTypeHeader, QString("multipart/form-data, boundary=")+boundary);
 		webPage.mainFrame()->load(r, QNetworkAccessManager::PostOperation, postData);
 	}
+#endif
 }
 
 void MyCookieJar::clearExtraCookies() {
@@ -628,7 +646,11 @@ LoaderObject * MultiPageLoaderPrivate::addResource(const QUrl & url, const setti
 	ResourceObject * ro = new ResourceObject(*this, url, page);
 	resources.push_back(ro);
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	return &ro->lo;
+#else
+	return NULL;
+#endif
 }
 
 void MultiPageLoaderPrivate::load() {
@@ -689,6 +711,7 @@ MultiPageLoader::~MultiPageLoader() {
   \brief Add a resource, to be loaded described by a string
   @param string Url describing the resource to load
 */
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 LoaderObject * MultiPageLoader::addResource(const QString & string, const settings::LoadPage & s, const QString * data) {
 	QString url=string;
 	if (data && !data->isEmpty()) {
@@ -718,6 +741,7 @@ LoaderObject * MultiPageLoader::addResource(const QString & string, const settin
 LoaderObject * MultiPageLoader::addResource(const QUrl & url, const settings::LoadPage & s) {
 	return d->addResource(url, s);
 }
+#endif
 
 /*!
   \brief Guess a url, by looking at a string

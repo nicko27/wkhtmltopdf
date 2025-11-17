@@ -172,7 +172,7 @@ void PdfConverterPrivate::beginConvert() {
 		PageObject & o=*i;
 		settings::PdfObject & s = o.settings;
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
         if (!s.header.htmlUrl.isEmpty() ) {
             if (looksLikeHtmlAndNotAUrl(s.header.htmlUrl)) {
                 emit out.error("--header-html should be a URL and not a string containing HTML code.");
@@ -212,12 +212,14 @@ void PdfConverterPrivate::beginConvert() {
         }
 #endif
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 		if (!s.isTableOfContent) {
 			o.loaderObject = pageLoader.addResource(s.page, s.load, &o.data);
 			o.page = &o.loaderObject->page;
 			PageObject::webPageToObject[o.page] = &o;
 			updateWebSettings(o.page->settings(), s.web);
 		}
+#endif
 	}
 
 	emit out.phaseChanged();
@@ -249,7 +251,7 @@ void PdfConverterPrivate::beginConvert() {
 #endif
 }
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 // calculates header/footer height
 // returns millimeters
 qreal PdfConverterPrivate::calculateHeaderHeight(PageObject & object, QWebPage & header) {
@@ -298,7 +300,7 @@ QPrinter * PdfConverterPrivate::createPrinter(const QString & tempFile) {
     return printer;
 }
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 void PdfConverterPrivate::preprocessPage(PageObject & obj) {
 	currentObject++;
 	if (obj.settings.isTableOfContent) {
@@ -421,12 +423,14 @@ void PdfConverterPrivate::pagesLoaded(bool ok) {
 	painter = new QPainter();
 
 	title = settings.documentTitle;
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 	for (int d=0; d < objects.size(); ++d) {
 		if (title != "") break;
 		if (!objects[d].loaderObject || objects[d].loaderObject->skip ||
 			objects[d].settings.isTableOfContent) continue;
 		title = objects[d].page->mainFrame()->title();
 	}
+#endif
 	printer->setDocName(title);
 	if (!painter->begin(printer)) {
 		emit out.error("Unable to write to destination");
@@ -452,7 +456,7 @@ void PdfConverterPrivate::pagesLoaded(bool ok) {
 }
 
 void PdfConverterPrivate::loadHeaders() {
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	currentPhase = 4;
 	emit out.phaseChanged();
 	bool hf=false;
@@ -488,7 +492,7 @@ void PdfConverterPrivate::loadHeaders() {
 
 
 void PdfConverterPrivate::loadTocs() {
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	std::swap(tocLoaderOld, tocLoader);
 	tocLoader->clearResources();
 
@@ -552,7 +556,7 @@ void PdfConverterPrivate::loadTocs() {
 #endif
 }
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 void PdfConverterPrivate::findLinks(QWebFrame * frame, QVector<QPair<QWebElement, QString> > & local, QVector<QPair<QWebElement, QString> > & external, QHash<QString, QWebElement> & anchors) {
 	bool ulocal=true, uexternal=true;
 	if (PageObject::webPageToObject.contains(frame->page())) {
@@ -743,14 +747,14 @@ void PdfConverterPrivate::handleTocPage(PageObject & obj) {
 
 
 void PdfConverterPrivate::tocLoaded(bool ok) {
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	if (errorCode == 0) errorCode = tocLoader->httpErrorCode();
 #endif
 	if (!ok) {
 		fail();
 		return;
 	}
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	tocChanged = false;
 	pageCount = 0;
 	currentObject = 0;
@@ -793,7 +797,7 @@ void PdfConverterPrivate::tocLoaded(bool ok) {
 
 
 void PdfConverterPrivate::measuringHeadersLoaded(bool ok) {
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
     if (errorCode == 0) errorCode = measuringHFLoader.httpErrorCode();
 #endif
     if (!ok) {
@@ -801,7 +805,7 @@ void PdfConverterPrivate::measuringHeadersLoaded(bool ok) {
         return;
     }
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
     for (int d=0; d < objects.size(); ++d) {
         PageObject & obj = objects[d];
         if (obj.measuringHeader) {
@@ -820,7 +824,7 @@ void PdfConverterPrivate::measuringHeadersLoaded(bool ok) {
 }
 
 void PdfConverterPrivate::headersLoaded(bool ok) {
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	if (errorCode == 0) errorCode = hfLoader.httpErrorCode();
 #endif
 	if (!ok) {
@@ -830,7 +834,7 @@ void PdfConverterPrivate::headersLoaded(bool ok) {
 	printDocument();
 }
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 
 void PdfConverterPrivate::spoolPage(int page) {
 	progressString = QString("Page ") + QString::number(actualPage) + QString(" of ") + QString::number(actualPages);
@@ -988,13 +992,13 @@ void PdfConverterPrivate::endPrintObject(PageObject & obj) {
 #endif
 
 void PdfConverterPrivate::printDocument() {
-#ifndef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if !defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	currentPhase = 1;
 	emit out.phaseChanged();
 	objects[0].page->mainFrame()->print(printer);
 	progressString = "";
 	emit out.progressChanged(-1);
-#else
+#elif defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	actualPage=1;
 
  	int cc=settings.collate?settings.copies:1;
@@ -1075,7 +1079,7 @@ void PdfConverterPrivate::printDocument() {
 	qApp->exit(0); // quit qt's event handling
 }
 
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 QWebPage * PdfConverterPrivate::loadHeaderFooter(QString url, const QHash<QString, QString> & parms, const settings::PdfObject & ps) {
 	QUrl u = MultiPageLoader::guessUrlFromString(url);
 	for (QHash<QString, QString>::const_iterator i=parms.begin(); i != parms.end(); ++i)
@@ -1099,7 +1103,7 @@ QString PdfConverterPrivate::hfreplace(const QString & q, const QHash<QString, Q
 void PdfConverterPrivate::clearResources() {
 	objects.clear();
 	pageLoader.clearResources();
-#ifdef __EXTENSIVE_WKHTMLTOPDF_QT_HACK__
+#if defined(__EXTENSIVE_WKHTMLTOPDF_QT_HACK__) && defined(WKHTMLTOPDF_USE_WEBKIT)
 	hfLoader.clearResources();
 	tocLoader1.clearResources();
 	tocLoader2.clearResources();
