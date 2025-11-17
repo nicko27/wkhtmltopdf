@@ -43,3 +43,9 @@ INSTALLS += target
 DESTDIR = ../../bin
 !windows: target.path=$$INSTALLBASE/lib
 else:     target.path=$$INSTALLBASE/bin
+
+# Set library version and soname for proper linking
+unix:!macx {
+    VERSION = 0.13.0
+    QMAKE_LFLAGS_SONAME = -Wl,-soname,libwkhtmltox.so.0
+}

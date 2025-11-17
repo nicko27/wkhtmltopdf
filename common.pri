@@ -26,6 +26,9 @@ RESOURCES    = $$PWD/wkhtmltopdf.qrc
 win32:      CONFIG += console
 win32-g++*: QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++
 
+# Installation base directory
+isEmpty(INSTALLBASE): INSTALLBASE = /usr/local
+
 # Backend selection - WebEngine ONLY (WebKit abandoned)
 # WebEngine provides modern Chromium engine with full CSS3/HTML5 support
 RENDER_BACKEND = $$(RENDER_BACKEND)

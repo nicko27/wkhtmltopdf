@@ -44,6 +44,16 @@ include(../shared/shared.pri)
 
 CONFIG(shared, shared|static) {
   LIBS += -L../../bin -lwkhtmltox
+
+  # Set RPATH so binary can find libwkhtmltox.so at runtime
+  unix:!macx {
+    QMAKE_LFLAGS += -Wl,-rpath,$$INSTALLBASE/lib
+    QMAKE_RPATHDIR += $$INSTALLBASE/lib
+  }
+
+  macx {
+    QMAKE_LFLAGS += -Wl,-rpath,$$INSTALLBASE/lib
+  }
 } else {
   include(../lib/lib.pri)
 }
