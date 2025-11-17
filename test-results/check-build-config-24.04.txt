@@ -1,0 +1,21 @@
+=== wkhtmltopdf Build Configuration Check ===
+Ubuntu Version: 24.04 (noble)
+Qt Version: Qt6 WebEngine
+Package Name: wkhtmltopdf-qt6
+QMake Command: qmake6
+Backend: WebEngine only (WebKit abandoned)
+
+--- Build Tools ---
+qmake6: not found (install qt6-base-dev)
+make: GNU Make 4.3
+gcc: gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
+dpkg-deb: available
+
+--- Qt Packages ---
+qt6-webengine-dev: missing
+qt6-base-dev: missing
+libqt6webenginewidgets6: missing
+libqt6webenginecore6: missing
+libqt6svg6-dev: missing
+
+Summary: Missing Qt6 WebEngine build dependencies in this environment.

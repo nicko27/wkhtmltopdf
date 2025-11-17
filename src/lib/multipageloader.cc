@@ -373,10 +373,12 @@ void ResourceObject::waitWindowStatus() {
 	}
 }
 
+#ifdef WKHTMLTOPDF_USE_WEBKIT
 void ResourceObject::printRequested(QWebFrame *) {
-	signalPrint=true;
-	loadDone();
+        signalPrint=true;
+        loadDone();
 }
+#endif
 
 void ResourceObject::loadDone() {
 	if (finished) return;
